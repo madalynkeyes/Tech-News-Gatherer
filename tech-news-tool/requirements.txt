@@ -1,2 +1,4 @@
 feedparser==6.0.12
+mysql-connector-python==9.6.0
+python-dotenv==1.2.2
 sgmllib3k==1.0.0
