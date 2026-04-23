@@ -1,6 +1,9 @@
+import time
+
 import feedparser
 from collections import Counter
 import re
+from db import insert_article, get_all_articles, get_connection, create_table
 
 FEEDS = [
     "https://techcrunch.com/category/artificial-intelligence/feed",
@@ -13,7 +16,7 @@ KEYWORDS = ["ai", "artificial intelligence", "startup", "machine learning", "llm
 
 def fetch_articles(feeds):
     seen_urls = set()   # tracks URLs we've already collected
-    articles = []       # final deduplicated list
+    articles = []       # final deduplicated list for printing
 
     for url in feeds:
         feed = feedparser.parse(url)
@@ -26,16 +29,23 @@ def fetch_articles(feeds):
                 continue
 
             seen_urls.add(link)
-
             articles.append({
                 "title": entry.get("title", "No title"),
                 "link": link,
                 "summary": entry.get("summary", ""),
                 "source": feed.feed.get("title", "Unknown"),
+                "published": convert_published_date(entry.published_parsed)
             })
 
     return articles
 
+def convert_published_date(published_parsed):
+    from datetime import datetime
+    if published_parsed:
+        dt = datetime.fromtimestamp(time.mktime(published_parsed))
+        mysql_dt = dt.strftime('%Y-%m-%d %H:%M:%S')
+        return mysql_dt
+    return None
 
 def filter_by_keywords(articles, keywords):
     results = []
@@ -86,20 +96,35 @@ def summarize_trends(articles):
     return summary
 
 
+def print_fetcher_summary(all_articles,filtered):
+    print(f"Found {len(all_articles)} total articles, {len(filtered)} after filtering.\n")
+    trends_summary = summarize_trends(filtered)
+    print(trends_summary)
+
+    print("\nFirst 5 filtered articles:\n")
+    for article in filtered[:5]:  # print first 5 matches
+        print(f"[{article['source']}] {article['title']}")
+        print(f"  {article['link']}")
+        print(f"  {article['summary']}")
+        print(f"  {article['published']}")
+        print()
+        print()
+
+def save_filtered_articles():
+    conn = get_connection()
+    if not conn:
+        print("Failed to connect to database. Exiting.")
+        return 
+    create_table(conn)
+    all_articles = fetch_articles(FEEDS)
+    filtered = filter_by_keywords(all_articles, KEYWORDS)
+    print_fetcher_summary(all_articles,filtered)
+    for article in filtered:
+        insert_article(conn, article)
+    # get_all_articles(conn)
+    conn.close()
+    print("Connection closed.")
+
+
 # --- run it ---
-all_articles = fetch_articles(FEEDS)
-filtered = filter_by_keywords(all_articles, KEYWORDS)
-
-print(f"Found {len(all_articles)} total articles, {len(filtered)} after filtering.\n")
-
-# Summarize trends
-trends_summary = summarize_trends(filtered)
-print(trends_summary)
-
-print("\nFirst 5 filtered articles:\n")
-for article in filtered[:5]:  # print first 5 matches
-    print(f"[{article['source']}] {article['title']}")
-    print(f"  {article['link']}")
-    print(f"  {article['summary']}")
-    print()
-    print()
+save_filtered_articles()
