@@ -1,9 +1,16 @@
+"""RSS fetcher module.
+
+This module downloads RSS feed entries, filters them by keywords,
+converts published dates, summarizes trending topics in the titles,
+and saves filtered articles into the database.
+"""
+
 import time
 
 import feedparser
 from collections import Counter
 import re
-from db import insert_article, get_all_articles, get_connection, create_table
+from db import insert_article
 
 FEEDS = [
     "https://techcrunch.com/category/artificial-intelligence/feed",
@@ -15,6 +22,15 @@ FEEDS = [
 KEYWORDS = ["ai", "artificial intelligence", "startup", "machine learning", "llm", "software"]
 
 def fetch_articles(feeds):
+    """Download and deduplicate articles from RSS feeds.
+
+    Args:
+        feeds: A list of RSS feed URLs.
+
+    Returns:
+        A list of article dictionaries containing title, link, summary,
+        source, and published date.
+    """
     seen_urls = set()   # tracks URLs we've already collected
     articles = []       # final deduplicated list for printing
 
@@ -40,6 +56,14 @@ def fetch_articles(feeds):
     return articles
 
 def convert_published_date(published_parsed):
+    """Convert a parsed RSS date to MySQL datetime format.
+
+    Args:
+        published_parsed: A time.struct_time object from feedparser.
+
+    Returns:
+        A string formatted as 'YYYY-MM-DD HH:MM:SS', or None if no date.
+    """
     from datetime import datetime
     if published_parsed:
         dt = datetime.fromtimestamp(time.mktime(published_parsed))
@@ -48,6 +72,16 @@ def convert_published_date(published_parsed):
     return None
 
 def filter_by_keywords(articles, keywords):
+    """Keep only articles that match at least one keyword.
+
+    Args:
+        articles: A list of article dictionaries.
+        keywords: A list of keyword strings to match.
+
+    Returns:
+        A filtered list of article dictionaries where the title or summary
+        contains any of the keywords.
+    """
     results = []
 
     for article in articles:
@@ -61,6 +95,15 @@ def filter_by_keywords(articles, keywords):
 
 
 def summarize_trends(articles):
+    """Summarize trends across a list of articles.
+
+    Args:
+        articles: A list of article dictionaries that were filtered by keywords.
+
+    Returns:
+        A string containing the count of articles per source and the top trending
+        words found in article titles.
+    """
     if not articles:
         return "No articles to summarize."
 
@@ -76,7 +119,7 @@ def summarize_trends(articles):
     words = re.findall(r'\b\w+\b', all_text.lower())
     
     # Remove common stop words (simple list)
-    stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','how', 'we', 'they', 'me', 'him', 'her', 'us', 'them'])
+    stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we', 'they', 'me', 'him', 'her', 'us', 'them'])
     filtered_words = [word for word in words if word not in stop_words and len(word) > 1]
     
     word_counts = Counter(filtered_words)
@@ -96,7 +139,13 @@ def summarize_trends(articles):
     return summary
 
 
-def print_fetcher_summary(all_articles,filtered):
+def print_fetcher_summary(all_articles, filtered):
+    """Print a summary of fetch results and the first few matched articles.
+
+    Args:
+        all_articles: The list of all fetched articles.
+        filtered: The list of articles that match the configured keywords.
+    """
     print(f"Found {len(all_articles)} total articles, {len(filtered)} after filtering.\n")
     trends_summary = summarize_trends(filtered)
     print(trends_summary)
@@ -110,21 +159,27 @@ def print_fetcher_summary(all_articles,filtered):
         print()
         print()
 
-def save_filtered_articles():
-    conn = get_connection()
-    if not conn:
-        print("Failed to connect to database. Exiting.")
-        return 
-    create_table(conn)
+def save_filtered_articles(conn):
+    """Fetch RSS articles, filter them, insert new matches, and print a summary.
+
+    Args:
+        conn: An open MySQL connection object.
+
+    This function fetches the configured RSS feeds, filters articles by the
+    defined keywords, inserts any new matching articles into the database,
+    and prints an update showing how many were inserted.
+    """
+    new_articles = 0
+    mycursor = conn.cursor()
     all_articles = fetch_articles(FEEDS)
     filtered = filter_by_keywords(all_articles, KEYWORDS)
-    print_fetcher_summary(all_articles,filtered)
     for article in filtered:
-        insert_article(conn, article)
+        new_articles += insert_article(conn, article)
+    if(new_articles > 0):
+        print(f"Inserted {new_articles} new articles into the database.\n")  
+    else:
+        print("No new articles to insert.\n\n")
+    print_fetcher_summary(all_articles, filtered)
     # get_all_articles(conn)
-    conn.close()
-    print("Connection closed.")
+    mycursor.close()
 
-
-# --- run it ---
-save_filtered_articles()

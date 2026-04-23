@@ -4,7 +4,17 @@ import os
 
 load_dotenv()
 
+
 def get_connection():
+    """Open a MySQL connection using credentials from the .env file.
+
+    Returns:
+        A MySQL connection object connected to the configured database,
+        or None if the connection fails.
+
+    The function first connects without a database and creates the configured
+    database if it does not already exist, then reconnects using that database.
+    """
     try:
         # First connect without database to create it if needed
         temp_conn = mysql.connector.connect(
@@ -32,6 +42,13 @@ def get_connection():
         return None
     
 def create_table(conn):
+    """Create the articles table if it does not already exist.
+
+    Args:
+        conn: An open MySQL connection object.
+
+    The table includes a unique link hash so duplicate articles are skipped.
+    """
 
     mycursor = conn.cursor()
     createdTable = '''
@@ -48,10 +65,27 @@ def create_table(conn):
     mycursor.close()
 
 def hash_url(url):
+    """Compute a SHA-256 hash for a URL.
+
+    Args:
+        url: The article URL to hash.
+
+    Returns:
+        A hexadecimal SHA-256 hash string used to deduplicate articles.
+    """
     import hashlib
     return hashlib.sha256(url.encode('utf-8')).hexdigest()
 
-def insert_article(conn,article):
+def insert_article(conn, article):
+    """Insert a filtered article into the database.
+
+    Args:
+        conn: An open MySQL connection object.
+        article: A dictionary containing title, link, published, summary, and source.
+
+    Returns:
+        The number of rows inserted (0 if the article already exists).
+    """
     mycursor = conn.cursor()
     sql = "INSERT IGNORE INTO articles (title, link_hash, published, summary, source) VALUES (%s, %s, %s, %s, %s)"
     val = (
@@ -63,12 +97,22 @@ def insert_article(conn,article):
     )
     mycursor.execute(sql, val)
     conn.commit()
+    rowcount = mycursor.rowcount
     mycursor.close()
+    return rowcount
 
 
 def get_all_articles(conn):
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT title, link_hash, published, summary, source FROM articles")
-        articles = cursor.fetchall()
-        cursor.close()
-        return articles
+    """Fetch all stored articles from the database.
+
+    Args:
+        conn: An open MySQL connection object.
+
+    Returns:
+        A list of article dictionaries from the articles table.
+    """
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT title, link_hash, published, summary, source FROM articles")
+    articles = cursor.fetchall()
+    cursor.close()
+    return articles
