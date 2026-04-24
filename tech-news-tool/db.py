@@ -56,6 +56,7 @@ def create_table(conn):
     id INT AUTO_INCREMENT PRIMARY KEY, 
     title TEXT NOT NULL, 
     link_hash VARCHAR(64) UNIQUE NOT NULL,
+    link TEXT NOT NULL,
     published TEXT, 
     summary TEXT, 
     source VARCHAR(255))
@@ -87,13 +88,15 @@ def insert_article(conn, article):
         The number of rows inserted (0 if the article already exists).
     """
     mycursor = conn.cursor()
-    sql = "INSERT IGNORE INTO articles (title, link_hash, published, summary, source) VALUES (%s, %s, %s, %s, %s)"
+    sql = "INSERT IGNORE INTO articles (title, link_hash, link, published, summary, source) VALUES (%s,%s, %s, %s, %s, %s)"
     val = (
         article["title"], 
-        hash_url(article["link"]), 
+        article["link_hash"],
+        article["link"], 
         article["published"], 
         article["summary"], 
-        article["source"]
+        article["source"],
+        
     )
     mycursor.execute(sql, val)
     conn.commit()
@@ -112,7 +115,7 @@ def get_all_articles(conn):
         A list of article dictionaries from the articles table.
     """
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT title, link_hash, published, summary, source FROM articles")
+    cursor.execute("SELECT title, link_hash, link, published, summary, source FROM articles")
     articles = cursor.fetchall()
     cursor.close()
     return articles

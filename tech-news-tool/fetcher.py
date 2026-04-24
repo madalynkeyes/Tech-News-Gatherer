@@ -10,7 +10,7 @@ import time
 import feedparser
 from collections import Counter
 import re
-from db import insert_article
+from db import hash_url, insert_article, get_all_articles, get_connection, create_table
 
 FEEDS = [
     "https://techcrunch.com/category/artificial-intelligence/feed",
@@ -47,6 +47,7 @@ def fetch_articles(feeds):
             seen_urls.add(link)
             articles.append({
                 "title": entry.get("title", "No title"),
+                "link_hash": hash_url(link),
                 "link": link,
                 "summary": entry.get("summary", ""),
                 "source": feed.feed.get("title", "Unknown"),

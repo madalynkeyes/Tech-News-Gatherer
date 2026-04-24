@@ -11,6 +11,8 @@ from fetcher import save_filtered_articles
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 
 def daily_fetch_and_store():
@@ -60,6 +62,7 @@ async def lifespan(app: FastAPI):
     print("Connection closed.")
 
 app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def get_db_connection():
     """Establish a database connection.
@@ -67,14 +70,19 @@ def get_db_connection():
     Returns:
         An open MySQL connection object, or prints an error and returns None if connection fails.
     """
+
+    conn = get_connection()
     try:
-        conn = get_connection()
         yield conn
     except Exception as e:
         print(f"Error connecting to database: {e}")
     finally:
         conn.close()
 
+@app.get("/")
+def read_root():
+    """Root endpoint that serves the static index.html page."""
+    return FileResponse("static/index.html")
 
 @app.get("/articles")
 def select_articles(conn=Depends(get_db_connection)):
@@ -87,7 +95,7 @@ def select_articles(conn=Depends(get_db_connection)):
     cursor.execute(select_query)
     articles = cursor.fetchall()
     cursor.close()
-    return {"articles": articles}
+    return {"articles": articles, "length": len(articles)}
 
 @app.post("/fetch")
 def fetch_and_store_articles(conn=Depends(get_db_connection)):

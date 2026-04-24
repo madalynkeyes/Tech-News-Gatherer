@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech News Tool</title>
+    <!-- <link rel="stylesheet" href="/static/styles.css"> -->
+</head>
+<body>
+    <header>
+        <h1>Tech News Tool</h1>
+    </header>
+    <main>
+        <p>Welcome to the Tech News Tool!</p>
+        <p>Welcome to the Tech News Tool! This application fetches the latest tech news articles from various RSS feeds, filters them based on keywords, and stores them in a database for easy access.</p>
+        <p>Use the API endpoints to view stored articles or trigger a manual fetch:</p>
+    </main>
+    <div id="articles-container"></div>
+        <script>
+            // Example of fetching articles from the API and displaying them
+            async function loadArticles() {
+                const response = await fetch("/articles");
+                const data = await response.json();
+                console.log(data);
+                const articlesList = document.createElement('ol');
+                data.articles.forEach(article => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `<a href="${article.link}" target="_blank">${article.title}</a> - ${article.published} - ${article.source} - ${article.summary}`;
+                    articlesList.appendChild(listItem);
+                });
+                document.body.appendChild(articlesList);
+            }
+            loadArticles();
+        </script>
+    </body>
+</body>
+
+</html>
