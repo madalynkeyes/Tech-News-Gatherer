@@ -8,13 +8,42 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI,Depends
 from db import get_connection, create_table
 from fetcher import save_filtered_articles
+from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+
+def daily_fetch_and_store():
+    """Fetch and store articles on a scheduled basis.
+
+    This function establishes its own database connection, fetches new RSS articles,
+    filters them by keywords, and stores matching ones in the database. It then
+    closes the connection to avoid resource leaks. This is used for the scheduled
+    task that runs every 4 hours.
+    """
+    print(f"Running scheduled fetch at {datetime.now()}")
+    conn = get_connection()
+    if conn:
+        try:
+            save_filtered_articles(conn)
+        finally:
+            conn.close()
+    else:
+        print("Failed to connect to database for scheduled fetch.")
+
+scheduler = BackgroundScheduler()
+trigger = IntervalTrigger(hours=4) 
+scheduler.add_job(daily_fetch_and_store, trigger)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage database connection lifecycle for the FastAPI app.
 
-    This context manager establishes a database connection when the app starts
-    and ensures it is properly closed when the app shuts down.
+    This context manager establishes a database connection when the app starts,
+    performs initial setup (create table, fetch articles), starts the scheduler,
+    and ensures everything is properly closed when the app shuts down. This 
+    allows us to run setup tasks before receiving any requests and to clean
+    up resources on shutdown.
     """
     conn = get_connection()
     if not conn:
@@ -22,10 +51,12 @@ async def lifespan(app: FastAPI):
         exit()
     create_table(conn)
     save_filtered_articles(conn)
-    conn.close()
+    scheduler.start()
 
     yield
-   
+    #close the connection and the scheduler on shutdown
+    conn.close()
+    scheduler.shutdown()
     print("Connection closed.")
 
 app = FastAPI(lifespan=lifespan)
@@ -68,3 +99,7 @@ def fetch_and_store_articles(conn=Depends(get_db_connection)):
     save_filtered_articles(conn)
     return {"message": "Articles fetched and stored successfully."}
 
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
