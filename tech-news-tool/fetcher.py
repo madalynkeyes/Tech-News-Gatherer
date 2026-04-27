@@ -159,6 +159,7 @@ def print_fetcher_summary(all_articles, filtered):
         print(f"  {article['published']}")
         print()
         print()
+    return trends_summary
 
 def save_filtered_articles(conn):
     """Fetch RSS articles, filter them, insert new matches, and print a summary.
@@ -180,7 +181,9 @@ def save_filtered_articles(conn):
         print(f"Inserted {new_articles} new articles into the database.\n")  
     else:
         print("No new articles to insert.\n\n")
-    print_fetcher_summary(all_articles, filtered)
+    trends_summary = print_fetcher_summary(all_articles, filtered)
     # get_all_articles(conn)
     mycursor.close()
+    return  len(all_articles),len(filtered),new_articles, trends_summary
+    
 

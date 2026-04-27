@@ -24,17 +24,27 @@ def daily_fetch_and_store():
     task that runs every 4 hours.
     """
     print(f"Running scheduled fetch at {datetime.now()}")
+    last_fetch_time = datetime.now()
     conn = get_connection()
     if conn:
         try:
-            save_filtered_articles(conn)
+            result = save_filtered_articles(conn)
+            fetch_state["last_fetch_time"] = last_fetch_time
+            fetch_state["trends_summary"] = result[3]  # trends_summary
+            fetch_state["new_articles"] = result[2]  # new_articles
         finally:
             conn.close()
     else:
         print("Failed to connect to database for scheduled fetch.")
 
+fetch_state = {
+    "last_fetch_time": None,
+    "trends_summary": None,
+    "new_articles": 0
+}
 scheduler = BackgroundScheduler()
-trigger = IntervalTrigger(hours=4) 
+trigger = IntervalTrigger(minutes=1)  # every 4 hours
+daily_fetch_and_store()  # run once at startup
 scheduler.add_job(daily_fetch_and_store, trigger)
 
 @asynccontextmanager
@@ -91,11 +101,15 @@ def select_articles(conn=Depends(get_db_connection)):
     This endpoint queries the articles table and returns the stored rows.
     """
     cursor = conn.cursor(dictionary=True)
-    select_query = "SELECT * FROM articles"
+    select_query = "SELECT * FROM articles ORDER BY published DESC"
     cursor.execute(select_query)
     articles = cursor.fetchall()
+
+    cursor.execute("SELECT COUNT(*) AS total FROM articles")
+    total = cursor.fetchone()["total"]
+
     cursor.close()
-    return {"articles": articles, "length": len(articles)}
+    return {"articles": articles, "length": len(articles), "total": total, "last_fetch": fetch_state["last_fetch_time"], "trends_summary": fetch_state["trends_summary"], "new_articles": fetch_state["new_articles"]}
 
 @app.post("/fetch")
 def fetch_and_store_articles(conn=Depends(get_db_connection)):
@@ -104,8 +118,8 @@ def fetch_and_store_articles(conn=Depends(get_db_connection)):
     This endpoint triggers the same storage behavior as the startup task,
     fetching RSS feeds, filtering by keywords, and inserting new articles.
     """
-    save_filtered_articles(conn)
-    return {"message": "Articles fetched and stored successfully."}
+    stats = save_filtered_articles(conn)
+    return {"message": "Articles fetched and stored successfully.", "stats": stats}
 
 
 if __name__ == "__main__":
