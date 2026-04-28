@@ -31,25 +31,18 @@
                 <i class="fa fa-remove"></i>
             </a>
             <img src="/w3images/avatar_g2.jpg" style="width:45%;" class="w3-round"><br><br>
-            <h4><b>PORTFOLIO</b></h4>
+            <h4><b>TECH NEWS</b></h4>
             <p class="w3-text-grey">Template by W3.CSS</p>
         </div>
         <div class="w3-bar-block">
-            <a href="#latest" onclick="w3_close()" class="w3-bar-item w3-button w3-padding w3-text-teal"><i
+            <a href="#latest-container" onclick="w3_close()" class="w3-bar-item w3-button w3-padding w3-text-teal"><i
                     class="fa fa-th-large fa-fw w3-margin-right"></i>Latest Articles</a>
-            <a href="#all-articles" onclick="w3_close()" class="w3-bar-item w3-button w3-padding"><i
-                    class="fa fa-user fa-fw w3-margin-right"></i>ALL ARTICLES</a>
-            <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button w3-padding"><i
-                    class="fa fa-envelope fa-fw w3-margin-right"></i>CONTACT</a>
+            <a href="#recent-stats-container" onclick="w3_close()" class="w3-bar-item w3-button w3-padding"><i
+                    class="fa fa-user fa-fw w3-margin-right"></i>Recent Stats</a>
+            <a href="#all-articles-container" onclick="w3_close()" class="w3-bar-item w3-button w3-padding"><i
+                    class="fa fa-envelope fa-fw w3-margin-right"></i>All Articles</a>
         </div>
-        <div class="w3-panel w3-large">
-            <i class="fa fa-facebook-official w3-hover-opacity"></i>
-            <i class="fa fa-instagram w3-hover-opacity"></i>
-            <i class="fa fa-snapchat w3-hover-opacity"></i>
-            <i class="fa fa-pinterest-p w3-hover-opacity"></i>
-            <i class="fa fa-twitter w3-hover-opacity"></i>
-            <i class="fa fa-linkedin w3-hover-opacity"></i>
-        </div>
+        
     </nav>
     <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer"
         title="close side menu" id="myOverlay"></div>
@@ -57,7 +50,7 @@
 
         <!-- Header -->
         <header id="portfolio">
-            <a href="#"><img src="/w3images/avatar_g2.jpg" style="width:65px;"
+            <a href="#"><img src="C:\Users\mkeyes0\Python Projects\tech-news-tool\static\images\mk.png" style="width:65px;"
                     class="w3-circle w3-right w3-margin w3-hide-large w3-hover-opacity"></a>
             <span class="w3-button w3-hide-large w3-xxlarge w3-hover-text-grey" onclick="w3_open()"><i
                     class="fa fa-bars"></i></span>
@@ -68,155 +61,58 @@
             </div>
         </header>
         <!-- Latest Container -->
-        <div class="w3-container w3-padding-large" id="latest-container" style="margin-bottom:32px">
+        <div class="w3-container" id="latest-container" style="margin-bottom:5px">
 
-            <p>Welcome to the Tech News Tool! This application fetches the latest tech news articles from various RSS
+            <p>Welcome to the Tech News Tool! This application fetches the latest tech news articles specifically about
+                AI from various RSS
                 feeds, filters them based on keywords, and stores them in a database for easy access.</p>
-            <h4><b>Top 5 Latest Articles</b></h4>
-            <hr>
+            <h4 style="padding-left:8px"><b>Top 6 Latest Articles</b></h4>
+
+            <!--First Photo Grid Latest Container Teal-->
+            <div class="w3-row-padding" id="latest-1"></div>
+
+            <!--Second Photo Grid Latest Container Teal-->
+            <div class=w3-row-padding id="latest-2"></div>
 
         </div>
+
         <!--Recent Stats Container-->
-        <div class="w3-container w3-padding-large" id="recent-stats-container" style="margin-bottom:32px">
-            <h4><b>Recent Stats</b></h4>
-            <p id="articles-found"></p>
-            <p id="last-fetch"></p>
-            <p id="new-articles"></p>
-            <p id="common-trends"></p>
+        <div class="w3-container " id="recent-stats-container"
+            style="margin-bottom:32px; padding-right:32px; padding-left: 32px;">
+            <div class="w3-col m6" style="padding-top: 16px;">
+                <h4><b>Recent Stats</b></h4>
+                <p id="articles-found"></p>
+                <p id="last-fetch"></p>
+                <p id="new-articles"></p>
+            </div>
+            <div class="w3-col m6 w3-grey w3-text-white" style="padding: 16px;">
+                <h4><b>Trends Summary</b></h4>
+                <p id="common-trends"></p>
+            </div>
             <hr>
         </div>
-
+        <div class="w3-container" style="padding-left:32px; padding: right 32px;">
+            <h4><b>All Articles</b></h4>
+        </div>
         <!-- All Articles Container -->
         <div id="all-articles-container" class="w3-row-padding">
-
-        </div>
-        <!-- First Photo Grid-->
-        <div class="w3-row-padding">
-            <div class="w3-third w3-container w3-margin-bottom">
-                <img src="/w3images/mountains.jpg" alt="Norway" style="width:100%" class="w3-hover-opacity">
-                <div class="w3-container w3-white">
-                    <p><b>Lorem Ipsum</b></p>
-                    <p>Praesent tincidunt sed tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae,
-                        ultricies congue gravida diam non fringilla.</p>
-                </div>
-            </div>
-            <div class="w3-third w3-container w3-margin-bottom">
-                <img src="/w3images/lights.jpg" alt="Norway" style="width:100%" class="w3-hover-opacity">
-                <div class="w3-container w3-white">
-                    <p><b>Lorem Ipsum</b></p>
-                    <p>Praesent tincidunt sed tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae,
-                        ultricies congue gravida diam non fringilla.</p>
-                </div>
-            </div>
-            <div class="w3-third w3-container">
-                <img src="/w3images/nature.jpg" alt="Norway" style="width:100%" class="w3-hover-opacity">
-                <div class="w3-container w3-white">
-                    <p><b>Lorem Ipsum</b></p>
-                    <p>Praesent tincidunt sed tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae,
-                        ultricies congue gravida diam non fringilla.</p>
-                </div>
-            </div>
         </div>
 
-        <!-- Second Photo Grid-->
-        <div class="w3-row-padding">
-            <div class="w3-third w3-container w3-margin-bottom">
-                <img src="/w3images/p1.jpg" alt="Norway" style="width:100%" class="w3-hover-opacity">
-                <div class="w3-container w3-white">
-                    <p><b>Lorem Ipsum</b></p>
-                    <p>Praesent tincidunt sed tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae,
-                        ultricies congue gravida diam non fringilla.</p>
-                </div>
-            </div>
-            <div class="w3-third w3-container w3-margin-bottom">
-                <img src="/w3images/p2.jpg" alt="Norway" style="width:100%" class="w3-hover-opacity">
-                <div class="w3-container w3-white">
-                    <p><b>Lorem Ipsum</b></p>
-                    <p>Praesent tincidunt sed tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae,
-                        ultricies congue gravida diam non fringilla.</p>
-                </div>
-            </div>
-            <div class="w3-third w3-container">
-                <img src="/w3images/p3.jpg" alt="Norway" style="width:100%" class="w3-hover-opacity">
-                <div class="w3-container w3-white">
-                    <p><b>Lorem Ipsum</b></p>
-                    <p>Praesent tincidunt sed tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae,
-                        ultricies congue gravida diam non fringilla.</p>
-                </div>
-            </div>
-        </div>
 
         <!-- Pagination -->
         <div class="w3-center w3-padding-32">
             <div class="w3-bar">
                 <a href="#" class="w3-bar-item w3-button w3-hover-black">«</a>
-                <a href="#" class="w3-bar-item w3-black w3-button">1</a>
-                <a href="#" class="w3-bar-item w3-button w3-hover-black">2</a>
-                <a href="#" class="w3-bar-item w3-button w3-hover-black">3</a>
-                <a href="#" class="w3-bar-item w3-button w3-hover-black">4</a>
                 <a href="#" class="w3-bar-item w3-button w3-hover-black">»</a>
             </div>
         </div>
 
-
-
-
         <!-- Footer -->
-        <footer class="w3-container w3-padding-32 w3-dark-grey">
-            <div class="w3-row-padding">
-                <div class="w3-third">
-                    <h3>FOOTER</h3>
-                    <p>Praesent tincidunt sed tellus ut rutrum. Sed vitae justo condimentum, porta lectus vitae,
-                        ultricies congue gravida diam non fringilla.</p>
-                    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
-                </div>
-
-                <div class="w3-third">
-                    <h3>BLOG POSTS</h3>
-                    <ul class="w3-ul w3-hoverable">
-                        <li class="w3-padding-16">
-                            <img src="/w3images/workshop.jpg" class="w3-left w3-margin-right" style="width:50px">
-                            <span class="w3-large">Lorem</span><br>
-                            <span>Sed mattis nunc</span>
-                        </li>
-                        <li class="w3-padding-16">
-                            <img src="/w3images/gondol.jpg" class="w3-left w3-margin-right" style="width:50px">
-                            <span class="w3-large">Ipsum</span><br>
-                            <span>Praes tinci sed</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="w3-third">
-                    <h3>POPULAR TAGS</h3>
-                    <p>
-                        <span class="w3-tag w3-black w3-margin-bottom">Travel</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">New York</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">London</span>
-                        <span class="w3-tag w3-grey w3-small w3-margin-bottom">IKEA</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">NORWAY</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">DIY</span>
-                        <span class="w3-tag w3-grey w3-small w3-margin-bottom">Ideas</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">Baby</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">Family</span>
-                        <span class="w3-tag w3-grey w3-small w3-margin-bottom">News</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">Clothing</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">Shopping</span>
-                        <span class="w3-tag w3-grey w3-small w3-margin-bottom">Sports</span> <span
-                            class="w3-tag w3-grey w3-small w3-margin-bottom">Games</span>
-                    </p>
-                </div>
-
-            </div>
-        </footer>
-
-        <div class="w3-black w3-center w3-padding-24">Powered by <a href="https://www.w3schools.com/w3css/default.asp"
-                title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></div>
+        <div class="w3-black w3-center w3-padding-24">- MK 2026 -</div>
 
         <!-- End page content -->
     </div>
     <script>
-        // Example of fetching articles from the API and displaying them
         function w3_open() {
             document.getElementById("mySidebar").style.display = "block";
             document.getElementById("myOverlay").style.display = "block";
@@ -226,51 +122,120 @@
             document.getElementById("mySidebar").style.display = "none";
             document.getElementById("myOverlay").style.display = "none";
         }
-        async function loadArticles() {
-            const response = await fetch("/articles");
-            const data = await response.json();
-            console.log(data);
-            const container = document.getElementById("all-articles-container");
+        const page_size = 10;
+        let currentPage = 0;
+        let allArticles = [];
 
-            data.articles.forEach(article => {
+        async function renderPage(page) {
+            const container = document.getElementById("all-articles-container");
+            container.innerHTML = "";
+            const start = page * page_size;
+            const end = start + page_size;
+            const articlesToShow = allArticles.slice(start, end);
+            articlesToShow.forEach(article => {
                 const card = document.createElement("div");
                 card.className = "w3-card w3-white w3-margin w3-padding";
                 card.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
-                <p class="w3-text-grey">${article.source} - ${article.published}</p>
+                <p class="w3-text-grey">${article.source} - ${new Date(article.published).toLocaleString()}</p>
                 <p>${article.summary}</p>`;
                 container.appendChild(card);
             });
+            currentPage = page;
+            buildPagination();
+        }
 
-            const latestContainer = document.getElementById("latest-container");
-            const latest = data.articles.slice(0, 5);
-            latest.forEach(article => {
+        async function buildPagination(){
+                const amount_of_articles = allArticles.length;
+                const total_pages = Math.ceil(amount_of_articles / page_size);
+                const paginationContainer = document.querySelector(".w3-bar");
+                if(currentPage === 0){
+                    paginationContainer.innerHTML = `<a href="#" class="w3-bar-item w3-button w3-hover-black w3-disabled">&laquo;</a>`;
+                } else {
+                    paginationContainer.innerHTML = `<a href="#" class="w3-bar-item w3-button w3-hover-black" onclick="renderPage(currentPage - 1)">&laquo;</a>`;
+                }
+                for(let i=0; i<total_pages; i++){
+                    paginationContainer.innerHTML += `<a href="#" class="w3-bar-item w3-button ${i === currentPage ? 'w3-black' : 'w3-hover-black'}" onclick="renderPage(${i})">${i+1}</a>`;
+                }
+                if(currentPage === total_pages - 1){
+                    paginationContainer.innerHTML += `<a href="#" class="w3-bar-item w3-button w3-hover-black w3-disabled">&raquo;</a>`;
+                } else {    
+                paginationContainer.innerHTML += `<a href="#" class="w3-bar-item w3-button w3-hover-black" onclick="renderPage(currentPage + 1)">&raquo;</a>`;
+                }
+            }
+
+        async function loadArticles() {
+            const response = await fetch("/articles");
+            const data = await response.json();
+            allArticles = data.articles;
+            const amount_of_articles = allArticles.length;
+            const total_pages = Math.ceil(amount_of_articles / page_size);
+            console.log(data);
+            renderPage(currentPage);
+            buildPagination();
+
+            const latest_1 = document.getElementById("latest-1");
+            const latest_articles_1 = data.articles.slice(0, 3);
+            let maxHeight_1 = 0;
+            const latestItems1 = [];
+
+            latest_articles_1.forEach(article => {
                 const item = document.createElement("div");
-                item.className = "w3-card w3-teal w3-margin w3-padding";
-                item.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
-                <p class="w3-text-black">${article.source} - ${article.published}</p>
-                <p>${article.summary}</p>`;
-                latestContainer.appendChild(item);
+                item.className = "w3-third w3-container w3-margin-bottom";
+                item.style.height = "auto"; // Allow height to adjust based on content
+                const inner = document.createElement("div");
+                inner.className = "w3-container w3-teal";
+                inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
+                <p class="w3-text-black">${article.source} - ${new Date(article.published).toLocaleString()}</p>`;
+                inner.style.height = "100%"; // Make inner div take full height of the item
+                item.appendChild(inner);
+                latest_1.appendChild(item);
+                latestItems1.push(item);
+
+                if (item.offsetHeight > maxHeight_1) {
+                    maxHeight_1 = item.offsetHeight;
+                }
+            });
+
+            latestItems1.forEach(item => {
+                item.style.height = maxHeight_1 + "px";
+            });
+
+            const latest_2 = document.getElementById("latest-2");
+            const latest_articles_2 = data.articles.slice(4, 7);
+            let maxHeight_2 = 0;
+            const latestItems2 = [];
+
+            latest_articles_2.forEach(article => {
+                const item = document.createElement("div");
+                item.className = "w3-third w3-container w3-margin-bottom";
+                const inner = document.createElement("div");
+                inner.className = "w3-container w3-teal";
+                inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
+                <p class="w3-text-black">${article.source} - ${new Date(article.published).toLocaleString()}</p>`;
+                inner.style.height = "100%"; // Make inner div take full height of the item
+                item.appendChild(inner);
+                latest_2.appendChild(item);
+                latestItems2.push(item);
+
+                if (item.offsetHeight > maxHeight_2) {
+                    maxHeight_2 = item.offsetHeight;
+                }
+            });
+
+            latestItems2.forEach(item => {
+                item.style.height = maxHeight_2 + "px";
             });
 
             const statsContainer = document.getElementById("recent-stats-container");
-            document.getElementById("articles-found").textContent = `Total Articles: ${data.total}`;
-            document.getElementById("last-fetch").textContent = `Last Fetch: ${new Date(data.last_fetch).toLocaleString()}`;
-            document.getElementById("new-articles").textContent = `New Articles Inserted: ${data.new_articles}`;
-            // document.getElementById("common-trends").textContent = `Trends Summary: ${data.trends_summary}`;
-            data.trends_summary.split('-').forEach(trend => {
+            document.getElementById("articles-found").innerHTML = `<p><b>Total Articles:</b> ${data.total}</p>`;
+            document.getElementById("last-fetch").innerHTML = `<p><b>Last Fetch:</b> ${new Date(data.last_fetch).toLocaleString()}</p>`;
+            document.getElementById("new-articles").innerHTML = `<p><b>New Articles Inserted:</b> ${data.new_articles}</p>`;
+            trends = data.trends_summary.split('-').slice(1); // Skip the first line which is just a header
+            trends.forEach(trend => {
                 const trendItem = document.createElement("p");
-                trendItem.textContent = `- ${trend.trim()}`;
-                statsContainer.appendChild(trendItem);
-            });
-
-
-            // const articlesList = document.createElement('ol');
-            // data.articles.forEach(article => {
-            //     const listItem = document.createElement('li');
-            //     listItem.innerHTML = `<a href="${article.link}" target="_blank">${article.title}</a> - ${article.published} - ${article.source} - ${article.summary}`;
-            //     articlesList.appendChild(listItem);
-            // });
-            // document.body.appendChild(articlesList);
+                trendItem.textContent = `• ${trend.trim()}`;
+                document.getElementById("common-trends").appendChild(trendItem);
+            })
         }
         loadArticles();
     </script>

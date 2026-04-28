@@ -120,7 +120,7 @@ def summarize_trends(articles):
     words = re.findall(r'\b\w+\b', all_text.lower())
     
     # Remove common stop words (simple list)
-    stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we', 'they', 'me', 'him', 'her', 'us', 'them'])
+    stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
     filtered_words = [word for word in words if word not in stop_words and len(word) > 1]
     
     word_counts = Counter(filtered_words)
@@ -128,12 +128,12 @@ def summarize_trends(articles):
     # Get top 10 words
     top_words = word_counts.most_common(10)
     
-    summary = f"Summary of {len(articles)} articles:\n\n"
-    summary += "Sources:\n"
-    for source, count in sources.items():
-        summary += f"- {source}: {count} articles\n"
+    # summary = f"Summary of {len(articles)} articles:\n\n"
+    # summary += "Sources:\n"
+    # for source, count in sources.items():
+    #     summary += f"- {source}: {count} articles\n"
     
-    summary += "\nTop trending words in titles:\n"
+    summary = "\nTop trending words in titles:\n"
     for word, count in top_words:
         summary += f"- {word}: {count} times\n"
     
@@ -151,8 +151,8 @@ def print_fetcher_summary(all_articles, filtered):
     trends_summary = summarize_trends(filtered)
     print(trends_summary)
 
-    print("\nFirst 5 filtered articles:\n")
-    for article in filtered[:5]:  # print first 5 matches
+    print("\nFirst 6 filtered articles:\n")
+    for article in filtered[:6]:  # print first 6 matches
         print(f"[{article['source']}] {article['title']}")
         print(f"  {article['link']}")
         print(f"  {article['summary']}")

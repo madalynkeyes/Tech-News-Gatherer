@@ -43,7 +43,7 @@ fetch_state = {
     "new_articles": 0
 }
 scheduler = BackgroundScheduler()
-trigger = IntervalTrigger(minutes=1)  # every 4 hours
+trigger = IntervalTrigger(hours=2)  # every 4 hours
 daily_fetch_and_store()  # run once at startup
 scheduler.add_job(daily_fetch_and_store, trigger)
 
