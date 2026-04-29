@@ -26,6 +26,7 @@ def daily_fetch_and_store():
     print(f"Running scheduled fetch at {datetime.now()}")
     last_fetch_time = datetime.now()
     conn = get_connection()
+    create_table(conn)
     if conn:
         try:
             result = save_filtered_articles(conn)
@@ -63,7 +64,7 @@ def weekly_cleanup():
             conn.close()
     else:
         print("Failed to connect to database for weekly cleanup.")
-        
+
 scheduler = BackgroundScheduler()
 trigger = IntervalTrigger(hours=2)  # every 4 hours
 daily_fetch_and_store()  # run once at startup

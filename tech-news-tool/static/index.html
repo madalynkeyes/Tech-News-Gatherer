@@ -189,6 +189,8 @@
             renderPage(currentPage);
             buildPagination();
 
+           
+
             const latest_1 = document.getElementById("latest-1");
             const latest_articles_1 = data.articles.slice(0, 3);
             let maxHeight_1 = 0;
@@ -199,10 +201,27 @@
                 item.className = "w3-third w3-container w3-margin-bottom";
                 item.style.height = "auto"; // Allow height to adjust based on content
                 const inner = document.createElement("div");
+                const photo = document.createElement("img");
+                if (article.image_url) {
+                    photo.src = article.image_url;
+                } else {
+                    if (article.source.toLowerCase().includes("techcrunch")) {
+                        photo.src = "/static/images/techcrunch.jpg";
+                    } else if (article.source.toLowerCase().includes("ai news")) {
+                        photo.src = "/static/images/ainews1.png";
+                    }
+                }
+                photo.alt = article.title;
+                photo.style.width = "100%";
+                photo.style.height = "176px";
+                photo.style.marginTop = "16px";
+                // photo.style = "padding-top:16px;"
+                photo.style.objectFit = "cover";
                 inner.className = "w3-container w3-teal";
                 inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
                 <p class="w3-text-black">${article.source} - ${new Date(article.published).toLocaleString()}</p>`;
                 inner.style.height = "100%"; // Make inner div take full height of the item
+                inner.insertBefore(photo, inner.firstChild); // Add photo at the top of the inner div
                 item.appendChild(inner);
                 latest_1.appendChild(item);
                 latestItems1.push(item);
@@ -224,11 +243,30 @@
             latest_articles_2.forEach(article => {
                 const item = document.createElement("div");
                 item.className = "w3-third w3-container w3-margin-bottom";
+                item.style.height = "auto"; // Allow height to adjust based on content
                 const inner = document.createElement("div");
+                const photo = document.createElement("img");
+                if (article.image_url) {
+                    photo.src = article.image_url;
+                } else {
+                    if (article.source.toLowerCase().includes("techcrunch")) {
+                        photo.src = "/static/images/techcrunch.jpg";
+                    } else if (article.source.toLowerCase().includes("ai")) {
+                        console.log("AHAHAH");
+                        photo.src = "/static/images/ainews1.png";
+                    }
+                }
+                photo.alt = article.title;
+                photo.style.width = "100%";
+                photo.style.height = "176px";
+                photo.style.marginTop = "16px";
+                // photo.style = "padding-top:16px;"
+                photo.style.objectFit = "cover";
                 inner.className = "w3-container w3-teal";
                 inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
                 <p class="w3-text-black">${article.source} - ${new Date(article.published).toLocaleString()}</p>`;
                 inner.style.height = "100%"; // Make inner div take full height of the item
+                inner.insertBefore(photo, inner.firstChild); // Add photo at the top of the inner div
                 item.appendChild(inner);
                 latest_2.appendChild(item);
                 latestItems2.push(item);

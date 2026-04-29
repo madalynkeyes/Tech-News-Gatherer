@@ -43,6 +43,7 @@ def fetch_articles(feeds):
             # skip if we've seen this URL before
             if link in seen_urls:
                 continue
+            image = entry.get("media_thumbnail", [{}])[0].get("url", "") if entry.get("media_thumbnail") else None
 
             seen_urls.add(link)
             articles.append({
@@ -51,7 +52,8 @@ def fetch_articles(feeds):
                 "link": link,
                 "summary": entry.get("summary", ""),
                 "source": feed.feed.get("title", "Unknown"),
-                "published": convert_published_date(entry.published_parsed)
+                "published": convert_published_date(entry.published_parsed),
+                "image_url": image
             })
 
     return articles
@@ -120,7 +122,7 @@ def summarize_trends(articles):
     words = re.findall(r'\b\w+\b', all_text.lower())
     
     # Remove common stop words (simple list)
-    stop_words = set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
+    stop_words = set(['just','from','next','the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
     filtered_words = [word for word in words if word not in stop_words and len(word) > 1]
     
     word_counts = Counter(filtered_words)

@@ -59,7 +59,9 @@ def create_table(conn):
     link TEXT NOT NULL,
     published TEXT, 
     summary TEXT, 
-    source VARCHAR(255))
+    source VARCHAR(255),
+    image_url TEXT
+    )
     '''
     mycursor.execute(createdTable)
     conn.commit()
@@ -88,7 +90,7 @@ def insert_article(conn, article):
         The number of rows inserted (0 if the article already exists).
     """
     mycursor = conn.cursor()
-    sql = "INSERT IGNORE INTO articles (title, link_hash, link, published, summary, source) VALUES (%s,%s, %s, %s, %s, %s)"
+    sql = "INSERT IGNORE INTO articles (title, link_hash, link, published, summary, source, image_url) VALUES (%s,%s, %s, %s, %s, %s, %s)"
     val = (
         article["title"], 
         article["link_hash"],
@@ -96,6 +98,7 @@ def insert_article(conn, article):
         article["published"], 
         article["summary"], 
         article["source"],
+        article["image_url"]
         
     )
     mycursor.execute(sql, val)
