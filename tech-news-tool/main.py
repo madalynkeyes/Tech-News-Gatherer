@@ -42,10 +42,33 @@ fetch_state = {
     "trends_summary": None,
     "new_articles": 0
 }
+
+def weekly_cleanup():
+    """Delete articles older than 7 days from the database.
+
+    This function establishes its own database connection, deletes old articles,
+    and then closes the connection. It is intended to run on a weekly schedule to
+    keep the database clean and performant.
+    """
+    print(f"Running weekly cleanup at {datetime.now()}")
+    conn = get_connection()
+    if conn:
+        try:
+            mycursor = conn.cursor()
+            delete_query = "DELETE FROM articles WHERE published < NOW() - INTERVAL 7 DAY"
+            mycursor.execute(delete_query)
+            conn.commit()
+            print(f"Deleted {mycursor.rowcount} old articles.")
+        finally:
+            conn.close()
+    else:
+        print("Failed to connect to database for weekly cleanup.")
+        
 scheduler = BackgroundScheduler()
 trigger = IntervalTrigger(hours=2)  # every 4 hours
 daily_fetch_and_store()  # run once at startup
 scheduler.add_job(daily_fetch_and_store, trigger)
+scheduler.add_job(weekly_cleanup, IntervalTrigger(days=7))  # every 7 days
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
