@@ -6,7 +6,7 @@ and to trigger a fresh RSS fetch and storage cycle.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI,Depends
-from db import get_connection, create_table
+from db import get_connection, create_table, delete_old_articles
 from fetcher import save_filtered_articles
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -55,21 +55,17 @@ def weekly_cleanup():
     conn = get_connection()
     if conn:
         try:
-            mycursor = conn.cursor()
-            delete_query = "DELETE FROM articles WHERE published < NOW() - INTERVAL 7 DAY"
-            mycursor.execute(delete_query)
-            conn.commit()
-            print(f"Deleted {mycursor.rowcount} old articles.")
+            cleanup_old_articles(conn)
         finally:
             conn.close()
     else:
         print("Failed to connect to database for weekly cleanup.")
 
 scheduler = BackgroundScheduler()
-trigger = IntervalTrigger(hours=2)  # every 4 hours
-daily_fetch_and_store()  # run once at startup
-scheduler.add_job(daily_fetch_and_store, trigger)
-scheduler.add_job(weekly_cleanup, IntervalTrigger(days=7))  # every 7 days
+# trigger = IntervalTrigger(hours=2)  # every 4 hours
+# daily_fetch_and_store()  # run once at startup
+# scheduler.add_job(daily_fetch_and_store, trigger,misfire_grace_time=3600,coalesce=True)
+# scheduler.add_job(weekly_cleanup, IntervalTrigger(days=7),misfire_grace_time=3600,coalesce=True)  # every 7 days
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -86,7 +82,14 @@ async def lifespan(app: FastAPI):
         print("Failed to connect to database. Exiting.")
         exit()
     create_table(conn)
-    save_filtered_articles(conn)
+    daily_fetch_and_store()
+    scheduler.add_job(
+        daily_fetch_and_store,
+        IntervalTrigger(hours=2),
+        misfire_grace_time=3600,
+        coalesce=True
+    )
+    scheduler.add_job(weekly_cleanup, IntervalTrigger(days=7),misfire_grace_time=3600,coalesce=True) 
     scheduler.start()
 
     yield
@@ -135,15 +138,22 @@ def select_articles(conn=Depends(get_db_connection)):
     cursor.close()
     return {"articles": articles, "length": len(articles), "total": total, "last_fetch": fetch_state["last_fetch_time"], "trends_summary": fetch_state["trends_summary"], "new_articles": fetch_state["new_articles"]}
 
-@app.post("/fetch")
+@app.get("/fetch")
 def fetch_and_store_articles(conn=Depends(get_db_connection)):
     """Fetch new RSS articles, filter them, and save matching ones.
 
     This endpoint triggers the same storage behavior as the startup task,
     fetching RSS feeds, filtering by keywords, and inserting new articles.
     """
+    daily_fetch_and_store()
     stats = save_filtered_articles(conn)
     return {"message": "Articles fetched and stored successfully.", "stats": stats}
+
+@app.post("/cleanup")
+def cleanup_old_articles(conn=Depends(get_db_connection)):
+    """Cleanup the database and delete any articles older than 7 days."""
+    deleted = delete_old_articles(conn)
+    return {"message": f"Deleted {deleted} articles older than 7 days"}
 
 
 if __name__ == "__main__":

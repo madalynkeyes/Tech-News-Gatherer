@@ -122,3 +122,19 @@ def get_all_articles(conn):
     articles = cursor.fetchall()
     cursor.close()
     return articles
+
+def delete_old_articles(conn):
+    """Delete all articles that were published more than 7 days ago.
+    
+    Args:
+        conn: An open MySQL connection object.
+        
+    Returns:
+        A count of how many articles were deleted from articles table.
+    """
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("DELETE FROM articles WHERE published < NOW() - INTERVAL 7 DAY")
+    deleted_count = cursor.rowcount
+    conn.commit()
+    cursor.close()
+    return deleted_count

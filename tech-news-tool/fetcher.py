@@ -15,7 +15,8 @@ from db import hash_url, insert_article, get_all_articles, get_connection, creat
 FEEDS = [
     "https://techcrunch.com/category/artificial-intelligence/feed",
     "https://www.wired.com/feed/tag/ai/latest/rss",
-    "https://www.artificialintelligence-news.com/feed/rss/"
+    "https://www.artificialintelligence-news.com/feed/rss/",
+    "https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml"
 
 ]
 
@@ -43,7 +44,12 @@ def fetch_articles(feeds):
             # skip if we've seen this URL before
             if link in seen_urls:
                 continue
-            image = entry.get("media_thumbnail", [{}])[0].get("url", "") if entry.get("media_thumbnail") else None
+            if entry.get("media_thumbnail"):
+                image = entry.get("media_thumbnail", [{}])[0].get("url", "")
+            elif 'enclosures' in entry and entry.enclosures:
+                image = entry.enclosures[0].get("href", "")
+            else:
+                image = None
 
             seen_urls.add(link)
             articles.append({
@@ -122,18 +128,13 @@ def summarize_trends(articles):
     words = re.findall(r'\b\w+\b', all_text.lower())
     
     # Remove common stop words (simple list)
-    stop_words = set(['just','from','next','the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
+    stop_words = set(['off','now', 'up','just','from','next','the', 'a','as', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
     filtered_words = [word for word in words if word not in stop_words and len(word) > 1]
     
     word_counts = Counter(filtered_words)
     
     # Get top 10 words
     top_words = word_counts.most_common(10)
-    
-    # summary = f"Summary of {len(articles)} articles:\n\n"
-    # summary += "Sources:\n"
-    # for source, count in sources.items():
-    #     summary += f"- {source}: {count} articles\n"
     
     summary = "\nTop trending words in titles:\n"
     for word, count in top_words:
@@ -150,7 +151,7 @@ def print_fetcher_summary(all_articles, filtered):
         filtered: The list of articles that match the configured keywords.
     """
     print(f"Found {len(all_articles)} total articles, {len(filtered)} after filtering.\n")
-    trends_summary = summarize_trends(filtered)
+    trends_summary = summarize_trends(all_articles)
     print(trends_summary)
 
     print("\nFirst 6 filtered articles:\n")

@@ -1,0 +1,36 @@
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255,255,255,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999; /* Ensure it stays on top */
+  transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+/* The spinning circle */
+.spinner {
+  border: 8px solid #f3f3f3; /* Light grey track */
+  border-top: 8px solid teal; /* Blue spinning part */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+/* Rotation animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Class to hide the loader */
+.loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+}

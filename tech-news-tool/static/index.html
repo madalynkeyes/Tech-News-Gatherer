@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/style.css">
     <style>
         body,
         h1,
@@ -48,6 +49,9 @@
     </nav>
     <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer"
         title="close side menu" id="myOverlay"></div>
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+    </div>
     <div class="w3-main" style="margin-left:300px">
 
         <!-- Header -->
@@ -86,6 +90,9 @@
                 <p id="articles-found"></p>
                 <p id="last-fetch"></p>
                 <p id="new-articles"></p>
+                <button class="w3-button w3-teal w3-margin-top" onclick="fetchArticles()">Fetch Newest Articles</button>
+                <button class="w3-button w3-grey w3-margin-top" onclick="runCleanup()" id="cleanup-btn">Cleanup Database</button>
+                <p id="cleanup-result"></p>
             </div>
             <div class="w3-col m6 w3-grey w3-text-white" style="padding: 16px;">
                 <h4><b>Trends Summary</b></h4>
@@ -96,6 +103,7 @@
         <div class="w3-container" style="padding-left:32px; padding: right 32px;">
             <h4><b>All Articles</b></h4>
         </div>
+
         <!-- All Articles Container -->
         <div id="all-articles-container" class="w3-row-padding">
         </div>
@@ -138,6 +146,12 @@
             active.classList.remove("w3-text-black");
         }
 
+        async function runCleanup() {
+            const response = await fetch("/cleanup", {method: "POST"});
+            const data = await response.json();
+            document.getElementById("cleanup-result").textContent = data.message;
+        }
+
         const page_size = 10;
         let currentPage = 0;
         let allArticles = [];
@@ -178,6 +192,18 @@
                 paginationContainer.innerHTML += `<a href="#" class="w3-bar-item w3-button w3-hover-black" onclick="renderPage(currentPage + 1)">&raquo;</a>`;
             }
         }
+        const loader = document.getElementById('loader');
+
+        async function fetchArticles() {
+            loader.classList.remove('loader-hidden');
+            const response = await fetch("/fetch");
+            const data = await response.json();
+            console.log(data);
+            loadArticles();
+            loader.classList.add('loader-hidden');
+            window.location.reload();
+        }
+
 
         async function loadArticles() {
             const response = await fetch("/articles");
@@ -215,13 +241,12 @@
                 photo.style.width = "100%";
                 photo.style.height = "176px";
                 photo.style.marginTop = "16px";
-                // photo.style = "padding-top:16px;"
                 photo.style.objectFit = "cover";
                 inner.className = "w3-container w3-teal";
                 inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
                 <p class="w3-text-black">${article.source} - ${new Date(article.published).toLocaleString()}</p>`;
                 inner.style.height = "100%"; // Make inner div take full height of the item
-                inner.insertBefore(photo, inner.firstChild); // Add photo at the top of the inner div
+                inner.insertBefore(photo, inner.firstChild); 
                 item.appendChild(inner);
                 latest_1.appendChild(item);
                 latestItems1.push(item);
@@ -252,7 +277,6 @@
                     if (article.source.toLowerCase().includes("techcrunch")) {
                         photo.src = "/static/images/techcrunch.jpg";
                     } else if (article.source.toLowerCase().includes("ai")) {
-                        console.log("AHAHAH");
                         photo.src = "/static/images/ainews1.png";
                     }
                 }
@@ -260,7 +284,6 @@
                 photo.style.width = "100%";
                 photo.style.height = "176px";
                 photo.style.marginTop = "16px";
-                // photo.style = "padding-top:16px;"
                 photo.style.objectFit = "cover";
                 inner.className = "w3-container w3-teal";
                 inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
@@ -292,6 +315,10 @@
             })
         }
         loadArticles();
+        window.addEventListener("load",function(){
+            const loader = document.getElementById("loader");
+            loader.classList.add("loader-hidden");
+        });
     </script>
 </body>
 
