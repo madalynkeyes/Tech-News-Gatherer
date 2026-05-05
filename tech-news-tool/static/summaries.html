@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech News Tool</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/mkwhite.png">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: "Raleway", sans-serif;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+</head>
+
+<body class="w3-light-grey w3-content" style="max-width:1600px">
+
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar">
+        <br>
+        <div class="w3-container">
+            <a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-jumbo w3-padding w3-hover-grey"
+                title="close menu">
+                <i class="fa fa-remove"></i>
+            </a>
+            <a href="/static/index.html">
+            <img src="/static/images/mkwhite.png" style="width:45%;" class="w3-round w3-hover-opacity"></a><br><br>
+            <h4><b>TECH NEWS</b></h4>
+            <p class="w3-text-grey">Template by W3.CSS</p>
+        </div>
+        <div class="w3-bar-block">
+            <a id="nav-home" href="/static/index.html" onclick="w3_close(); setActiveNav('nav-home')"
+                class="w3-bar-item w3-button w3-padding">
+                <i class="fa fa-arrow-left fa-fw w3-margin-right"></i>Back
+            </a>
+            <a id="nav-summaries" href="/static/summaries.html" onclick="w3_close(); setActiveNav('nav-summaries')"
+                class="w3-bar-item w3-button w3-padding w3-text-teal">
+                <i class="fa fa-book fa-fw w3-margin-right"></i>All Summaries
+            </a>
+        </div>
+    </nav>
+
+    <!-- Overlay (mobile) -->
+    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer"
+        title="close side menu" id="myOverlay"></div>
+
+    <!-- Full-screen loader -->
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Main content -->
+    <div class="w3-main" style="margin-left:300px">
+
+        <!-- Header -->
+        <header id="portfolio">
+            <a href="#">
+                <img src="/static/images/mkgrey.png" style="width:80px;"
+                    class="w3-right w3-margin w3-hide-large w3-hover-opacity">
+            </a>
+            <span class="w3-button w3-hide-large w3-xxlarge w3-hover-text-grey" onclick="w3_open()">
+                <i class="fa fa-bars"></i>
+            </span>
+            <div class="w3-container">
+                <h1><b>Tech News Tool</b></h1>
+                <div class="w3-section w3-bottombar w3-padding-16"></div>
+            </div>
+        </header>
+
+
+        <!--AI Summary-->
+        <div class="w3-container" style="margin-bottom:32px; padding-right:32px; padding-left:32px;"
+            id="ai-summary-container">
+            <button class="collapsible w3-teal" id="all-summaries"></button>
+            <div class="content">
+                <p id="ai-summary-text"></p>
+            </div>
+         
+        </div>
+
+       
+        <!-- All Articles cards (paginated) -->
+        <div id="all-articles-container" class="w3-row-padding"></div>
+
+        <!-- Pagination bar -->
+        <div class="w3-center w3-padding-32">
+            <div class="w3-bar">
+                <!-- Buttons injected by buildPagination() in app.js -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="w3-black w3-center w3-padding-24">- MK 2026 -</div>
+
+    </div><!-- end .w3-main -->
+
+    <script src="/static/app.js"></script>
+
+</body>
+
+</html>

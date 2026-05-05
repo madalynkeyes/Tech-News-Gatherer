@@ -178,3 +178,10 @@ def delete_old_articles(conn):
     conn.commit()
     cursor.close()
     return deleted_count
+
+def get_latest_summary(conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT summary FROM summaries ORDER BY id DESC LIMIT 1")
+    summary = cursor.fetchone()
+    cursor.close()
+    return summary[0]

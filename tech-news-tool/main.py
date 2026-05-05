@@ -6,7 +6,7 @@ and to trigger a fresh RSS fetch and storage cycle.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI,Depends
-from db import get_connection, create_articles_table, delete_old_articles, create_summaries_table
+from db import get_connection, create_articles_table, delete_old_articles, create_summaries_table, get_latest_summary
 from fetcher import save_filtered_articles, ai_summarize
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -85,8 +85,9 @@ async def lifespan(app: FastAPI):
         exit()
     create_articles_table(conn)
     create_summaries_table(conn)
+    
+    fetch_state["ai_summary"]=get_latest_summary(conn)
     daily_fetch_and_store()
-    fetch_state["ai_summary"]=ai_summarize(conn)
     scheduler.add_job(
         daily_fetch_and_store,
         IntervalTrigger(hours=2),

@@ -90,6 +90,7 @@ function getFallbackImage(source) {
 function buildArticleImage(article) {
     const photo = document.createElement("img");
     photo.src = article.image_url || getFallbackImage(article.source);
+    photo.classList = "w3-hover-opacity";
     photo.alt = article.title;
     photo.style.width = "100%";
     photo.style.height = "176px";
@@ -317,3 +318,19 @@ loadArticles();
 window.addEventListener("load", () => {
     loader.classList.add("loader-hidden");
 });
+
+//AI Summary Collapsible
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    }
+  });
+}

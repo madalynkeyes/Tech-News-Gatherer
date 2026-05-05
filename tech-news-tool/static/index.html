@@ -5,12 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tech News Tool</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/mkwhite.png">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/style.css">
     <style>
-        body, h1, h2, h3, h4, h5, h6 {
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-family: "Raleway", sans-serif;
         }
     </style>
@@ -27,37 +34,37 @@
                 title="close menu">
                 <i class="fa fa-remove"></i>
             </a>
-            <img src="/static/images/mkwhite.png" style="width:45%;" class="w3-round"><br><br>
+            <a href="/static/index.html">
+            <img src="/static/images/mkwhite.png" style="width:45%;" class="w3-round w3-hover-opacity"></a><br><br>
             <h4><b>TECH NEWS</b></h4>
             <p class="w3-text-grey">Template by W3.CSS</p>
         </div>
         <div class="w3-bar-block">
-            <a id="nav-latest" href="#latest-container"
-                onclick="w3_close(); setActiveNav('nav-latest')"
+            <a id="nav-latest" href="#latest-container" onclick="w3_close(); setActiveNav('nav-latest')"
                 class="w3-bar-item w3-button w3-padding w3-text-teal">
                 <i class="fa fa-newspaper-o fa-fw w3-margin-right"></i>Latest Articles
             </a>
-            <a id="nav-recent" href="#recent-stats-container"
-                onclick="w3_close(); setActiveNav('nav-recent')"
+            <a id="nav-recent" href="#recent-stats-container" onclick="w3_close(); setActiveNav('nav-recent')"
                 class="w3-bar-item w3-button w3-padding">
                 <i class="fa fa-folder-open fa-fw w3-margin-right"></i>Recent Stats
             </a>
-            <a id="nav-recent" href="#ai-summary-container"
-                onclick="w3_close(); setActiveNav('nav-summary')"
+            <a id="nav-summary" href="#ai-summary-container" onclick="w3_close(); setActiveNav('nav-summary')"
                 class="w3-bar-item w3-button w3-padding">
                 <i class="fa fa-lightbulb-o fa-fw w3-margin-right"></i>AI Summary
             </a>
-            <a id="nav-all" href="#all-articles-container"
-                onclick="w3_close(); setActiveNav('nav-all')"
+            <a id="nav-all" href="#all-articles-container" onclick="w3_close(); setActiveNav('nav-all')"
                 class="w3-bar-item w3-button w3-padding">
                 <i class="fa fa-th-large fa-fw w3-margin-right"></i>All Articles
             </a>
+            <a id="nav-summaries" href="/static/summaries.html" onclick="w3_close(); setActiveNav('nav-summaries')"
+                class="w3-bar-item w3-button w3-padding">
+                <i class="fa fa-book fa-fw w3-margin-right"></i>All Summaries</a>
         </div>
     </nav>
 
     <!-- Overlay (mobile) -->
-    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()"
-        style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer"
+        title="close side menu" id="myOverlay"></div>
 
     <!-- Full-screen loader -->
     <div class="loader-overlay" id="loader">
@@ -86,7 +93,11 @@
         <div class="w3-container" id="latest-container" style="margin-bottom:5px">
             <p>Welcome to the Tech News Tool! This application fetches the latest tech news articles specifically about
                 AI from various RSS feeds, filters them based on keywords, and stores them in a database for easy
-                access.</p>
+                access. Gemini AI takes the latest 10 articles and creates a simplified summary of the top
+                technology advancements of AI. To generate a new summary of the latest articles, click the "Generate AI
+                Summary" button. This application is updated every two hours but can also be updated by clicking
+                "Fetch Newest Articles" button below. Articles older than 7 days are automatically removed from the database and
+                can also be removed immediately by clicking the "Cleanup Database" button below.</p>
             <h2 style="padding-left:8px"><b>Top 6 Latest Articles</b></h2>
             <div class="w3-row-padding" id="latest-1"></div>
             <div class="w3-row-padding" id="latest-2"></div>
@@ -100,18 +111,21 @@
                 <p id="articles-found"></p>
                 <p id="last-fetch"></p>
                 <p id="new-articles"></p>
-                <button class="w3-button w3-teal w3-margin-top" onclick="fetchArticles()" style="width: 183.25px; margin-top:-10px">
+                <button class="w3-button w3-teal w3-margin-top" onclick="fetchArticles()"
+                    style="width: 183.25px; margin-top:-10px">
                     Fetch Newest Articles
                 </button>
-                <button class="w3-button w3-grey w3-margin-top" onclick="runCleanup()" style="width:183.25px; margin-top:-10px">
+                <button class="w3-button w3-grey w3-margin-top" onclick="runCleanup()"
+                    style="width:183.25px; margin-top:-10px">
                     Cleanup Database
                 </button>
-                
+
                 <div>
-                    <button class="w3-button w3-black" style="width: 183.25px; margin-top:5px;" onclick="generateSummary()">Generate AI Summary</button>
+                    <button class="w3-button w3-black" style="width: 183.25px; margin-top:5px;"
+                        onclick="generateSummary()">Generate AI Summary</button>
                 </div>
                 <p id="cleanup-result"></p>
-             
+
             </div>
             <div class="w3-col m6 w3-grey w3-text-white" style="padding:16px;">
                 <h2><b>Trends Summary</b></h2>
@@ -121,9 +135,13 @@
         </div>
 
         <!--AI Summary-->
-        <div class="w3-container" style="margin-bottom:32px; padding-right:32px; padding-left:32px;" id="ai-summary-container">
-            <h2><b>GEMINI AI Summary</b></h2>
-            <p id="ai-summary"></p>
+        <div class="w3-container" style="margin-bottom:32px; padding-right:32px; padding-left:32px;"
+            id="ai-summary-container">
+            <button class="collapsible w3-teal">GEMINI AI Summary</button>
+            <div class="content">
+                <p id="ai-summary"></p>
+            </div>
+         
         </div>
 
         <!-- All Articles heading -->
@@ -149,4 +167,5 @@
     <script src="/static/app.js"></script>
 
 </body>
+
 </html>
