@@ -6,8 +6,8 @@ and to trigger a fresh RSS fetch and storage cycle.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI,Depends
-from db import get_connection, create_table, delete_old_articles
-from fetcher import save_filtered_articles
+from db import get_connection, create_articles_table, delete_old_articles, create_summaries_table
+from fetcher import save_filtered_articles, ai_summarize
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -26,13 +26,14 @@ def daily_fetch_and_store():
     print(f"Running scheduled fetch at {datetime.now()}")
     last_fetch_time = datetime.now()
     conn = get_connection()
-    create_table(conn)
+    create_articles_table(conn)
     if conn:
         try:
             result = save_filtered_articles(conn)
             fetch_state["last_fetch_time"] = last_fetch_time
             fetch_state["trends_summary"] = result[3]  # trends_summary
             fetch_state["new_articles"] = result[2]  # new_articles
+    
         finally:
             conn.close()
     else:
@@ -41,7 +42,8 @@ def daily_fetch_and_store():
 fetch_state = {
     "last_fetch_time": None,
     "trends_summary": None,
-    "new_articles": 0
+    "new_articles": 0,
+    "ai_summary":"No new articles to summarize"
 }
 
 def weekly_cleanup():
@@ -81,8 +83,10 @@ async def lifespan(app: FastAPI):
     if not conn:
         print("Failed to connect to database. Exiting.")
         exit()
-    create_table(conn)
+    create_articles_table(conn)
+    create_summaries_table(conn)
     daily_fetch_and_store()
+    fetch_state["ai_summary"]=ai_summarize(conn)
     scheduler.add_job(
         daily_fetch_and_store,
         IntervalTrigger(hours=2),
@@ -136,7 +140,14 @@ def select_articles(conn=Depends(get_db_connection)):
     total = cursor.fetchone()["total"]
 
     cursor.close()
-    return {"articles": articles, "length": len(articles), "total": total, "last_fetch": fetch_state["last_fetch_time"], "trends_summary": fetch_state["trends_summary"], "new_articles": fetch_state["new_articles"]}
+    return {"articles": articles, "length": len(articles), "total": total, "last_fetch": fetch_state["last_fetch_time"], "trends_summary": fetch_state["trends_summary"], "new_articles": fetch_state["new_articles"], "ai_summary": fetch_state["ai_summary"]}
+
+@app.get("/articles/summary")
+def get_ai_summary(conn=Depends(get_db_connection)):
+    """Calls ai_summarize function to summarize 10 most recent articles.
+    """
+    fetch_state["ai_summary"]=ai_summarize(conn)
+    return {"ai_summary":fetch_state["ai_summary"]}
 
 @app.get("/fetch")
 def fetch_and_store_articles(conn=Depends(get_db_connection)):
@@ -159,3 +170,6 @@ def cleanup_old_articles(conn=Depends(get_db_connection)):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+#TODO: update READme, Add Claude AI summary, Deploy, make accessible on phone?

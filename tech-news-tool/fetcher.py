@@ -10,7 +10,11 @@ import time
 import feedparser
 from collections import Counter
 import re
-from db import hash_url, insert_article, get_all_articles, get_connection, create_table
+from db import hash_url, insert_article, get_all_articles, insert_summary
+from google import genai
+from dotenv import load_dotenv
+import os
+from datetime import datetime
 
 FEEDS = [
     "https://techcrunch.com/category/artificial-intelligence/feed",
@@ -21,6 +25,8 @@ FEEDS = [
 ]
 
 KEYWORDS = ["ai", "artificial intelligence", "startup", "machine learning", "llm", "software"]
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def fetch_articles(feeds):
     """Download and deduplicate articles from RSS feeds.
@@ -128,7 +134,7 @@ def summarize_trends(articles):
     words = re.findall(r'\b\w+\b', all_text.lower())
     
     # Remove common stop words (simple list)
-    stop_words = set(['off','now', 'up','just','from','next','the', 'a','as', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
+    stop_words = set(['off','says', 'raises','now', 'up','just','from','next','the', 'a','as', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
     filtered_words = [word for word in words if word not in stop_words and len(word) > 1]
     
     word_counts = Counter(filtered_words)
@@ -164,6 +170,29 @@ def print_fetcher_summary(all_articles, filtered):
         print()
     return trends_summary
 
+def ai_summarize(conn):
+    """Fetch RSS articles, get the 10 most recent and generate AI summary.
+    
+    Args:
+        conn: An open MySQL connection object.
+        
+    This function fetches RSS articles, stores the links of the 10 most
+    recent articles in a list and then generates an AI summary using 
+    Gemini API model which will summarize the main updates in AI tech.
+    """
+    all_articles = get_all_articles(conn)
+    list_of_links = []
+    for article in all_articles[:10]:
+        list_of_links.append(article['link'])
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview", 
+        contents=[list_of_links,
+                  "Analyze these 10 most recent articles on AI innovations and please provide me with a short catchy simplified summary of the latest news on AI technology and how it would apply to a college software engineering student that is not aware of any technology changes."]
+    )
+    print(response.text)
+    insert_summary(conn,{"summary": response.text, "date":datetime.now()})
+    return response.text
+
 def save_filtered_articles(conn):
     """Fetch RSS articles, filter them, insert new matches, and print a summary.
 
@@ -185,7 +214,7 @@ def save_filtered_articles(conn):
     else:
         print("No new articles to insert.\n\n")
     trends_summary = print_fetcher_summary(all_articles, filtered)
-    # get_all_articles(conn)
+    get_all_articles(conn)
     mycursor.close()
     return  len(all_articles),len(filtered),new_articles, trends_summary
     

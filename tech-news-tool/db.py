@@ -41,7 +41,7 @@ def get_connection():
         print(f"Error: {err}")
         return None
     
-def create_table(conn):
+def create_articles_table(conn):
     """Create the articles table if it does not already exist.
 
     Args:
@@ -61,6 +61,25 @@ def create_table(conn):
     summary TEXT, 
     source VARCHAR(255),
     image_url TEXT
+    )
+    '''
+    mycursor.execute(createdTable)
+    conn.commit()
+    mycursor.close()
+
+def create_summaries_table(conn):
+    """Create the summaries table if it does not already exist.
+
+    Args:
+        conn: An open MySQL connection object.
+
+    """
+    mycursor = conn.cursor()
+    createdTable = '''
+    CREATE TABLE IF NOT EXISTS summaries (
+    id INT AUTO_INCREMENT PRIMARY KEY, 
+    summary TEXT NOT NULL, 
+    date TEXT
     )
     '''
     mycursor.execute(createdTable)
@@ -107,6 +126,27 @@ def insert_article(conn, article):
     mycursor.close()
     return rowcount
 
+def insert_summary(conn, summary):
+    """Insert an AI generated summary into the database.
+
+    Args:
+        conn: An open MySQL connection object.
+        summary: A dictionary containing summary and date created
+
+    Returns:
+        The number of rows inserted (0 if the article already exists).
+    """
+    mycursor = conn.cursor()
+    sql = "INSERT IGNORE INTO summaries (summary, date) VALUES (%s,%s)"
+    val = (
+        summary["summary"],
+        summary["date"]
+    )
+    mycursor.execute(sql,val)
+    conn.commit()
+    rowcount = mycursor.rowcount
+    mycursor.close()
+    return rowcount
 
 def get_all_articles(conn):
     """Fetch all stored articles from the database.

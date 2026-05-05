@@ -5,27 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tech News Tool</title>
-    <!-- <link rel="stylesheet" href="/static/styles.css"> -->
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/style.css">
     <style>
-        body,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: "Raleway", sans-serif
+        body, h1, h2, h3, h4, h5, h6 {
+            font-family: "Raleway", sans-serif;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 </head>
 
 <body class="w3-light-grey w3-content" style="max-width:1600px">
-    <!-- Sidebar/menu -->
-    <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
+
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar">
+        <br>
         <div class="w3-container">
             <a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-jumbo w3-padding w3-hover-grey"
                 title="close menu">
@@ -36,290 +32,121 @@
             <p class="w3-text-grey">Template by W3.CSS</p>
         </div>
         <div class="w3-bar-block">
-            <a id="nav-latest" href="#latest-container" onclick="w3_close(); setActiveNav('nav-latest')" class="w3-bar-item w3-button w3-padding w3-text-teal"><i
-                    class="fa fa-th-large fa-fw w3-margin-right"></i>Latest Articles</a>
-            <a id="nav-recent" href="#recent-stats-container" onclick="w3_close(); setActiveNav('nav-recent')"
-                class="w3-bar-item w3-button w3-padding"><i class="fa fa-user fa-fw w3-margin-right"></i>Recent
-                Stats</a>
-            <a id="nav-all" href="#all-articles-container" onclick="w3_close(); setActiveNav('nav-all')"
-                class="w3-bar-item w3-button w3-padding"><i class="fa fa-envelope fa-fw w3-margin-right"></i>All
-                Articles</a>
+            <a id="nav-latest" href="#latest-container"
+                onclick="w3_close(); setActiveNav('nav-latest')"
+                class="w3-bar-item w3-button w3-padding w3-text-teal">
+                <i class="fa fa-newspaper-o fa-fw w3-margin-right"></i>Latest Articles
+            </a>
+            <a id="nav-recent" href="#recent-stats-container"
+                onclick="w3_close(); setActiveNav('nav-recent')"
+                class="w3-bar-item w3-button w3-padding">
+                <i class="fa fa-folder-open fa-fw w3-margin-right"></i>Recent Stats
+            </a>
+            <a id="nav-recent" href="#ai-summary-container"
+                onclick="w3_close(); setActiveNav('nav-summary')"
+                class="w3-bar-item w3-button w3-padding">
+                <i class="fa fa-lightbulb-o fa-fw w3-margin-right"></i>AI Summary
+            </a>
+            <a id="nav-all" href="#all-articles-container"
+                onclick="w3_close(); setActiveNav('nav-all')"
+                class="w3-bar-item w3-button w3-padding">
+                <i class="fa fa-th-large fa-fw w3-margin-right"></i>All Articles
+            </a>
         </div>
-
     </nav>
-    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer"
-        title="close side menu" id="myOverlay"></div>
+
+    <!-- Overlay (mobile) -->
+    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()"
+        style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+    <!-- Full-screen loader -->
     <div class="loader-overlay" id="loader">
         <div class="spinner"></div>
     </div>
+
+    <!-- Main content -->
     <div class="w3-main" style="margin-left:300px">
 
         <!-- Header -->
         <header id="portfolio">
-            <a href="#"><img src="/static/images/mkgrey.png" style="width:80px;"
-                    class="w3-right w3-margin w3-hide-large w3-hover-opacity"></a>
-            <span class="w3-button w3-hide-large w3-xxlarge w3-hover-text-grey" onclick="w3_open()"><i
-                    class="fa fa-bars"></i></span>
+            <a href="#">
+                <img src="/static/images/mkgrey.png" style="width:80px;"
+                    class="w3-right w3-margin w3-hide-large w3-hover-opacity">
+            </a>
+            <span class="w3-button w3-hide-large w3-xxlarge w3-hover-text-grey" onclick="w3_open()">
+                <i class="fa fa-bars"></i>
+            </span>
             <div class="w3-container">
                 <h1><b>Tech News Tool</b></h1>
-                <div class="w3-section w3-bottombar w3-padding-16">
-                </div>
+                <div class="w3-section w3-bottombar w3-padding-16"></div>
             </div>
         </header>
-        <!-- Latest Container -->
+
+        <!-- Latest Articles -->
         <div class="w3-container" id="latest-container" style="margin-bottom:5px">
-
             <p>Welcome to the Tech News Tool! This application fetches the latest tech news articles specifically about
-                AI from various RSS
-                feeds, filters them based on keywords, and stores them in a database for easy access.</p>
-            <h4 style="padding-left:8px"><b>Top 6 Latest Articles</b></h4>
-
-            <!--First Photo Grid Latest Container Teal-->
+                AI from various RSS feeds, filters them based on keywords, and stores them in a database for easy
+                access.</p>
+            <h2 style="padding-left:8px"><b>Top 6 Latest Articles</b></h2>
             <div class="w3-row-padding" id="latest-1"></div>
-
-            <!--Second Photo Grid Latest Container Teal-->
-            <div class=w3-row-padding id="latest-2"></div>
-
+            <div class="w3-row-padding" id="latest-2"></div>
         </div>
 
-        <!--Recent Stats Container-->
-        <div class="w3-container " id="recent-stats-container"
-            style="margin-bottom:32px; padding-right:32px; padding-left: 32px;">
-            <div class="w3-col m6" style="padding-top: 16px;">
-                <h4><b>Recent Stats</b></h4>
+        <!-- Recent Stats -->
+        <div class="w3-container" id="recent-stats-container"
+            style="margin-bottom:32px; padding-right:32px; padding-left:32px;">
+            <div class="w3-col m6" style="padding-top:16px;">
+                <h2><b>Recent Stats</b></h2>
                 <p id="articles-found"></p>
                 <p id="last-fetch"></p>
                 <p id="new-articles"></p>
-                <button class="w3-button w3-teal w3-margin-top" onclick="fetchArticles()">Fetch Newest Articles</button>
-                <button class="w3-button w3-grey w3-margin-top" onclick="runCleanup()" id="cleanup-btn">Cleanup Database</button>
+                <button class="w3-button w3-teal w3-margin-top" onclick="fetchArticles()" style="width: 183.25px; margin-top:-10px">
+                    Fetch Newest Articles
+                </button>
+                <button class="w3-button w3-grey w3-margin-top" onclick="runCleanup()" style="width:183.25px; margin-top:-10px">
+                    Cleanup Database
+                </button>
+                
+                <div>
+                    <button class="w3-button w3-black" style="width: 183.25px; margin-top:5px;" onclick="generateSummary()">Generate AI Summary</button>
+                </div>
                 <p id="cleanup-result"></p>
+             
             </div>
-            <div class="w3-col m6 w3-grey w3-text-white" style="padding: 16px;">
-                <h4><b>Trends Summary</b></h4>
+            <div class="w3-col m6 w3-grey w3-text-white" style="padding:16px;">
+                <h2><b>Trends Summary</b></h2>
                 <p id="common-trends"></p>
             </div>
             <hr>
         </div>
-        <div class="w3-container" style="padding-left:32px; padding: right 32px;">
-            <h4><b>All Articles</b></h4>
+
+        <!--AI Summary-->
+        <div class="w3-container" style="margin-bottom:32px; padding-right:32px; padding-left:32px;" id="ai-summary-container">
+            <h2><b>GEMINI AI Summary</b></h2>
+            <p id="ai-summary"></p>
         </div>
 
-        <!-- All Articles Container -->
-        <div id="all-articles-container" class="w3-row-padding">
+        <!-- All Articles heading -->
+        <div class="w3-container" style="padding-left:32px;">
+            <h2><b>All Articles</b></h2>
         </div>
 
+        <!-- All Articles cards (paginated) -->
+        <div id="all-articles-container" class="w3-row-padding"></div>
 
-        <!-- Pagination -->
+        <!-- Pagination bar -->
         <div class="w3-center w3-padding-32">
             <div class="w3-bar">
-                <a href="#" class="w3-bar-item w3-button w3-hover-black">«</a>
-                <a href="#" class="w3-bar-item w3-button w3-hover-black">»</a>
+                <!-- Buttons injected by buildPagination() in app.js -->
             </div>
         </div>
 
         <!-- Footer -->
         <div class="w3-black w3-center w3-padding-24">- MK 2026 -</div>
 
-        <!-- End page content -->
-    </div>
-    <script>
-        function w3_open() {
-            document.getElementById("mySidebar").style.display = "block";
-            document.getElementById("myOverlay").style.display = "block";
-        }
+    </div><!-- end .w3-main -->
 
-        function w3_close() {
-            document.getElementById("mySidebar").style.display = "none";
-            document.getElementById("myOverlay").style.display = "none";
-        }
+    <script src="/static/app.js"></script>
 
-
-        function setActiveNav(navId) {
-            // remove active from all
-            document.querySelectorAll(".w3-bar-block a").forEach(link => {
-                link.classList.remove("w3-teal", "w3-text-white");
-                link.classList.add("w3-text-black");
-            });
-            // set active on clicked one
-            const active = document.getElementById(navId);
-            active.classList.add("w3-text-teal");
-            active.classList.remove("w3-text-black");
-        }
-
-        async function runCleanup() {
-            const response = await fetch("/cleanup", {method: "POST"});
-            const data = await response.json();
-            document.getElementById("cleanup-result").textContent = data.message;
-        }
-
-        const page_size = 10;
-        let currentPage = 0;
-        let allArticles = [];
-
-        async function renderPage(page) {
-            const container = document.getElementById("all-articles-container");
-            container.innerHTML = "";
-            const start = page * page_size;
-            const end = start + page_size;
-            const articlesToShow = allArticles.slice(start, end);
-            articlesToShow.forEach(article => {
-                const card = document.createElement("div");
-                card.className = "w3-card w3-white w3-margin w3-padding";
-                card.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
-                <p class="w3-text-grey">${article.source} - ${new Date(article.published).toLocaleString()}</p>
-                <p>${article.summary}</p>`;
-                container.appendChild(card);
-            });
-            currentPage = page;
-            buildPagination();
-        }
-
-        async function buildPagination() {
-            const amount_of_articles = allArticles.length;
-            const total_pages = Math.ceil(amount_of_articles / page_size);
-            const paginationContainer = document.querySelector(".w3-bar");
-            if (currentPage === 0) {
-                paginationContainer.innerHTML = `<a href="#" class="w3-bar-item w3-button w3-hover-black w3-disabled">&laquo;</a>`;
-            } else {
-                paginationContainer.innerHTML = `<a href="#" class="w3-bar-item w3-button w3-hover-black" onclick="renderPage(currentPage - 1)">&laquo;</a>`;
-            }
-            for (let i = 0; i < total_pages; i++) {
-                paginationContainer.innerHTML += `<a href="#" class="w3-bar-item w3-button ${i === currentPage ? 'w3-black' : 'w3-hover-black'}" onclick="renderPage(${i})">${i + 1}</a>`;
-            }
-            if (currentPage === total_pages - 1) {
-                paginationContainer.innerHTML += `<a href="#" class="w3-bar-item w3-button w3-hover-black w3-disabled">&raquo;</a>`;
-            } else {
-                paginationContainer.innerHTML += `<a href="#" class="w3-bar-item w3-button w3-hover-black" onclick="renderPage(currentPage + 1)">&raquo;</a>`;
-            }
-        }
-        const loader = document.getElementById('loader');
-
-        async function fetchArticles() {
-            loader.classList.remove('loader-hidden');
-            const response = await fetch("/fetch");
-            const data = await response.json();
-            console.log(data);
-            loadArticles();
-            loader.classList.add('loader-hidden');
-            window.location.reload();
-        }
-
-
-        async function loadArticles() {
-            const response = await fetch("/articles");
-            const data = await response.json();
-            allArticles = data.articles;
-            const amount_of_articles = allArticles.length;
-            const total_pages = Math.ceil(amount_of_articles / page_size);
-            console.log(data);
-            renderPage(currentPage);
-            buildPagination();
-
-           
-
-            const latest_1 = document.getElementById("latest-1");
-            const latest_articles_1 = data.articles.slice(0, 3);
-            let maxHeight_1 = 0;
-            const latestItems1 = [];
-
-            latest_articles_1.forEach(article => {
-                const item = document.createElement("div");
-                item.className = "w3-third w3-container w3-margin-bottom";
-                item.style.height = "auto"; // Allow height to adjust based on content
-                const inner = document.createElement("div");
-                const photo = document.createElement("img");
-                if (article.image_url) {
-                    photo.src = article.image_url;
-                } else {
-                    if (article.source.toLowerCase().includes("techcrunch")) {
-                        photo.src = "/static/images/techcrunch.jpg";
-                    } else if (article.source.toLowerCase().includes("ai news")) {
-                        photo.src = "/static/images/ainews1.png";
-                    }
-                }
-                photo.alt = article.title;
-                photo.style.width = "100%";
-                photo.style.height = "176px";
-                photo.style.marginTop = "16px";
-                photo.style.objectFit = "cover";
-                inner.className = "w3-container w3-teal";
-                inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
-                <p class="w3-text-black">${article.source} - ${new Date(article.published).toLocaleString()}</p>`;
-                inner.style.height = "100%"; // Make inner div take full height of the item
-                inner.insertBefore(photo, inner.firstChild); 
-                item.appendChild(inner);
-                latest_1.appendChild(item);
-                latestItems1.push(item);
-
-                if (item.offsetHeight > maxHeight_1) {
-                    maxHeight_1 = item.offsetHeight;
-                }
-            });
-
-            latestItems1.forEach(item => {
-                item.style.height = maxHeight_1 + "px";
-            });
-
-            const latest_2 = document.getElementById("latest-2");
-            const latest_articles_2 = data.articles.slice(4, 7);
-            let maxHeight_2 = 0;
-            const latestItems2 = [];
-
-            latest_articles_2.forEach(article => {
-                const item = document.createElement("div");
-                item.className = "w3-third w3-container w3-margin-bottom";
-                item.style.height = "auto"; // Allow height to adjust based on content
-                const inner = document.createElement("div");
-                const photo = document.createElement("img");
-                if (article.image_url) {
-                    photo.src = article.image_url;
-                } else {
-                    if (article.source.toLowerCase().includes("techcrunch")) {
-                        photo.src = "/static/images/techcrunch.jpg";
-                    } else if (article.source.toLowerCase().includes("ai")) {
-                        photo.src = "/static/images/ainews1.png";
-                    }
-                }
-                photo.alt = article.title;
-                photo.style.width = "100%";
-                photo.style.height = "176px";
-                photo.style.marginTop = "16px";
-                photo.style.objectFit = "cover";
-                inner.className = "w3-container w3-teal";
-                inner.innerHTML = `<h5><a href="${article.link}" target="_blank">${article.title}</a></h5>
-                <p class="w3-text-black">${article.source} - ${new Date(article.published).toLocaleString()}</p>`;
-                inner.style.height = "100%"; // Make inner div take full height of the item
-                inner.insertBefore(photo, inner.firstChild); // Add photo at the top of the inner div
-                item.appendChild(inner);
-                latest_2.appendChild(item);
-                latestItems2.push(item);
-
-                if (item.offsetHeight > maxHeight_2) {
-                    maxHeight_2 = item.offsetHeight;
-                }
-            });
-
-            latestItems2.forEach(item => {
-                item.style.height = maxHeight_2 + "px";
-            });
-
-            const statsContainer = document.getElementById("recent-stats-container");
-            document.getElementById("articles-found").innerHTML = `<p><b>Total Articles:</b> ${data.total}</p>`;
-            document.getElementById("last-fetch").innerHTML = `<p><b>Last Fetch:</b> ${new Date(data.last_fetch).toLocaleString()}</p>`;
-            document.getElementById("new-articles").innerHTML = `<p><b>New Articles Inserted:</b> ${data.new_articles}</p>`;
-            trends = data.trends_summary.split('-').slice(1); // Skip the first line which is just a header
-            trends.forEach(trend => {
-                const trendItem = document.createElement("p");
-                trendItem.textContent = `• ${trend.trim()}`;
-                document.getElementById("common-trends").appendChild(trendItem);
-            })
-        }
-        loadArticles();
-        window.addEventListener("load",function(){
-            const loader = document.getElementById("loader");
-            loader.classList.add("loader-hidden");
-        });
-    </script>
 </body>
-
 </html>
