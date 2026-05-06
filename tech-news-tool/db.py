@@ -180,8 +180,29 @@ def delete_old_articles(conn):
     return deleted_count
 
 def get_latest_summary(conn):
+    """Get the newest AI generated summary
+    Args:
+        conn: An open MySQL connection object.
+    
+    Returns:
+        The text of the latest AI generate summary.
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT summary FROM summaries ORDER BY id DESC LIMIT 1")
     summary = cursor.fetchone()
     cursor.close()
     return summary[0]
+
+def get_all_summaries(conn):
+    """Get all the AI generated summaries from the database.
+    Args:
+        conn: An open MySQL connection object.
+        
+    Returns:
+        A list of summaries and the dates they were generated from the summaries table.
+    """
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM summaries")
+    summaries = cursor.fetchall()
+    cursor.close()
+    return summaries

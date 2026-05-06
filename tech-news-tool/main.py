@@ -6,7 +6,7 @@ and to trigger a fresh RSS fetch and storage cycle.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI,Depends
-from db import get_connection, create_articles_table, delete_old_articles, create_summaries_table, get_latest_summary
+from db import get_connection, create_articles_table, delete_old_articles, create_summaries_table, get_latest_summary, get_all_summaries
 from fetcher import save_filtered_articles, ai_summarize
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -139,7 +139,6 @@ def select_articles(conn=Depends(get_db_connection)):
 
     cursor.execute("SELECT COUNT(*) AS total FROM articles")
     total = cursor.fetchone()["total"]
-
     cursor.close()
     return {"articles": articles, "length": len(articles), "total": total, "last_fetch": fetch_state["last_fetch_time"], "trends_summary": fetch_state["trends_summary"], "new_articles": fetch_state["new_articles"], "ai_summary": fetch_state["ai_summary"]}
 
@@ -149,6 +148,12 @@ def get_ai_summary(conn=Depends(get_db_connection)):
     """
     fetch_state["ai_summary"]=ai_summarize(conn)
     return {"ai_summary":fetch_state["ai_summary"]}
+
+@app.get("/summaries")
+def fetch_all_summaries(conn=Depends(get_db_connection)):
+    """Fetch all ai summaries stored in database."""
+    summaries = get_all_summaries(conn)
+    return summaries
 
 @app.get("/fetch")
 def fetch_and_store_articles(conn=Depends(get_db_connection)):
