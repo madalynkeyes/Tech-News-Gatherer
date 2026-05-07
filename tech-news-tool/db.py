@@ -158,7 +158,7 @@ def get_all_articles(conn):
         A list of article dictionaries from the articles table.
     """
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT title, link_hash, link, published, summary, source FROM articles")
+    cursor.execute("SELECT * FROM articles ORDER BY published DESC")
     articles = cursor.fetchall()
     cursor.close()
     return articles
