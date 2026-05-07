@@ -16,7 +16,7 @@
 /* The spinning circle */
 .spinner {
   border: 8px solid #f3f3f3; /* Light grey track */
-  border-top: 8px solid teal; /* Blue spinning part */
+  border-top: 8px solid #009688; /* Blue spinning part */
   border-radius: 50%;
   width: 60px;
   height: 60px;

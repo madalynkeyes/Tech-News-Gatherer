@@ -114,6 +114,9 @@ function buildArticleImage(article) {
  * @returns {HTMLDivElement} A fully constructed tile element.
  */
 function buildLatestTile(article) {
+    if(article.source=="Feed: Artificial Intelligence Latest") {
+        article.source = "Wired";
+    }
     const item = document.createElement("div");
     item.className = "w3-third w3-container w3-margin-bottom";
 
@@ -177,6 +180,9 @@ function renderPage(page) {
     const pageArticles = allArticles.slice(start, start + PAGE_SIZE);
 
     pageArticles.forEach(article => {
+        if(article.source=="Feed: Artificial Intelligence Latest") {
+            article.source = "Wired";
+        }
         const card = document.createElement("div");
         card.className = "w3-card w3-white w3-margin w3-padding";
         card.innerHTML = `

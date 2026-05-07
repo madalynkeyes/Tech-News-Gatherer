@@ -202,7 +202,7 @@ def get_all_summaries(conn):
         A list of summaries and the dates they were generated from the summaries table.
     """
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM summaries")
+    cursor.execute("SELECT * FROM summaries ORDER BY id DESC")
     summaries = cursor.fetchall()
     cursor.close()
     return summaries

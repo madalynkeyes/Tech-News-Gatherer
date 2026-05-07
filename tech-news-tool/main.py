@@ -64,10 +64,6 @@ def weekly_cleanup():
         print("Failed to connect to database for weekly cleanup.")
 
 scheduler = BackgroundScheduler()
-# trigger = IntervalTrigger(hours=2)  # every 4 hours
-# daily_fetch_and_store()  # run once at startup
-# scheduler.add_job(daily_fetch_and_store, trigger,misfire_grace_time=3600,coalesce=True)
-# scheduler.add_job(weekly_cleanup, IntervalTrigger(days=7),misfire_grace_time=3600,coalesce=True)  # every 7 days
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -176,6 +172,3 @@ def cleanup_old_articles(conn=Depends(get_db_connection)):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
-#TODO: update READme, Add Claude AI summary, Deploy, make accessible on phone?
