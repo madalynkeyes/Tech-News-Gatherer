@@ -130,6 +130,26 @@ Visit `http://localhost:8000` in your browser.
 
 ---
 
+## Demo
+
+
+https://github.com/user-attachments/assets/5d11ee68-3110-4412-9c71-171f2eb175ea
+
+
+https://github.com/user-attachments/assets/1b9d7ca5-871d-4559-86f2-814d188047bb
+
+
+https://github.com/user-attachments/assets/bfd83d52-1655-49a1-b621-42690799eba8
+
+
+https://github.com/user-attachments/assets/13ecfb37-4088-43e3-8683-c2d5b25b6363
+
+
+https://github.com/user-attachments/assets/6622aefb-8964-47d9-8cbd-75830e6dba33
+
+
+---
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
