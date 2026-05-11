@@ -1,112 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech News Tool</title>
-    <link rel="icon" type="image/x-icon" href="/static/images/mkwhite.png">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        body,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: "Raleway", sans-serif;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summaries — AI Today</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #0d0d0d;
+      --ink-mid:  #444;
+      --ink-soft: #888;
+      --paper:    #fafaf8;
+      --paper-2:  #f2f1ee;
+      --accent:   #c84b31;
+      --accent-2: #1a3a2a;
+      --rule:     #dddbd6;
+      --ff-serif: 'Playfair Display', Georgia, serif;
+      --ff-sans:  'DM Sans', system-ui, sans-serif;
+      --ff-mono:  'DM Mono', monospace;
+      --nav-h:    64px;
+      --max-w:    800px;
+      --gutter:   clamp(16px, 4vw, 48px);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--ff-sans);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Nav (same as index) ──────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0; z-index: 100;
+      height: var(--nav-h);
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--gutter);
+    }
+    .nav__inner {
+      width: 100%; max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav__logo { font-family: var(--ff-serif); font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em; }
+    .nav__logo span { color: var(--accent); }
+    .nav__links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+    .nav__links a {
+      font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink-mid); transition: color 0.2s;
+      position: relative; padding-bottom: 2px;
+    }
+    .nav__links a::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; width: 0; height: 1px;
+      background: var(--accent); transition: width 0.25s ease;
+    }
+    .nav__links a:hover { color: var(--ink); }
+    .nav__links a:hover::after, .nav__links a.active::after { width: 100%; }
+    .nav__links a.active { color: var(--ink); }
+
+    /* ── Page header ─────────────────────────────────────────── */
+    .page-header {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 64px var(--gutter) 40px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .page-header__eyebrow {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .page-header__title {
+      font-family: var(--ff-serif);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .page-header__sub {
+      font-size: 0.9rem;
+      color: var(--ink-mid);
+      max-width: 480px;
+    }
+
+    /* ── Generate button ─────────────────────────────────────── */
+    .generate-bar {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 32px var(--gutter);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--rule);
+      flex-wrap: wrap;
+    }
+    .gen-btn {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 11px 24px;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+    .gen-btn:hover { background: var(--accent); }
+    .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .gen-note {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      color: var(--ink-soft);
+    }
+
+    /* ── Summary cards ───────────────────────────────────────── */
+    .summaries-wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter) 80px;
+    }
+
+    .summary-card {
+      border-bottom: 1px solid var(--rule);
+      padding: 40px 0;
+    }
+
+    .summary-card__meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card__badge {
+      font-family: var(--ff-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      background: var(--accent-2);
+      color: #c5d9c8;
+      border-radius: 2px;
+    }
+
+    .summary-card__date {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      color: var(--ink-soft);
+    }
+
+    /* Markdown content styling */
+    .summary-card__content { color: var(--ink-mid); }
+    .summary-card__content h1,
+    .summary-card__content h2,
+    .summary-card__content h3 {
+      font-family: var(--ff-serif);
+      color: var(--ink);
+      margin: 24px 0 10px;
+      line-height: 1.2;
+    }
+    .summary-card__content h3 { font-size: 1.1rem; }
+    .summary-card__content h4 {
+      font-family: var(--ff-sans);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin: 20px 0 6px;
+    }
+    .summary-card__content p { margin-bottom: 12px; font-size: 0.9rem; line-height: 1.75; }
+    .summary-card__content ul, .summary-card__content ol {
+      margin: 8px 0 16px 20px; font-size: 0.9rem; line-height: 1.7;
+    }
+    .summary-card__content li { margin-bottom: 4px; }
+    .summary-card__content strong { color: var(--ink); font-weight: 500; }
+    .summary-card__content em { color: var(--ink-mid); }
+    .summary-card__content hr {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 24px 0;
+    }
+    .summary-card__content a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+
+    /* ── Empty state ─────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 0;
+      color: var(--ink-soft);
+    }
+    .empty-state__icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    .empty-state__text {
+      font-family: var(--ff-serif);
+      font-size: 1.3rem;
+      font-style: italic;
+      margin-bottom: 8px;
+      color: var(--ink-mid);
+    }
+    .empty-state__sub {
+      font-family: var(--ff-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Spinner ─────────────────────────────────────────────── */
+    .spinner-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 24px 0;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--rule);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .spinner-label {
+      font-family: var(--ff-mono);
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+      letter-spacing: 0.06em;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.4);
+      padding: 32px var(--gutter);
+    }
+    .footer__inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .footer__logo { font-family: var(--ff-serif); font-size: 1rem; font-weight: 900; color: rgba(255,255,255,0.7); }
+    .footer__logo span { color: var(--accent); }
+    .footer__note { font-family: var(--ff-mono); font-size: 0.62rem; letter-spacing: 0.06em; }
+
+    @media (max-width: 768px) { .nav__links { display: none; } }
+  </style>
 </head>
+<body>
 
-<body class="w3-light-grey w3-content" style="max-width:1600px">
-
-    <!-- Sidebar -->
-    <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar">
-        <br>
-        <div class="w3-container">
-            <a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-jumbo w3-padding w3-hover-grey"
-                title="close menu">
-                <i class="fa fa-remove"></i>
-            </a>
-            <a href="/static/index.html">
-            <img src="/static/images/mkwhite.png" style="width:45%;" class="w3-round w3-hover-opacity"></a><br><br>
-            <h4><b>TECH NEWS</b></h4>
-            <p class="w3-text-grey">Template by W3.CSS</p>
-        </div>
-        <div class="w3-bar-block">
-            <a id="nav-home" href="/static/index.html" onclick="w3_close(); setActiveNav('nav-home')"
-                class="w3-bar-item w3-button w3-padding">
-                <i class="fa fa-arrow-left fa-fw w3-margin-right"></i>Back
-            </a>
-            <a id="nav-summaries" href="/static/summaries.html" onclick="w3_close(); setActiveNav('nav-summaries')"
-                class="w3-bar-item w3-button w3-padding w3-text-teal">
-                <i class="fa fa-book fa-fw w3-margin-right"></i>All Summaries
-            </a>
-        </div>
-    </nav>
-
-    <!-- Overlay (mobile) -->
-    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer"
-        title="close side menu" id="myOverlay"></div>
-
-    <!-- Full-screen loader -->
-    <div class="loader-overlay" id="loader">
-        <div class="spinner"></div>
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav__inner">
+      <a href="/static/index.html" class="nav__logo">AI<span>Today</span></a>
+      <ul class="nav__links">
+        <li><a href="/static/index.html#home">Home</a></li>
+        <li><a href="/static/index.html#stats">Stats</a></li>
+        <li><a href="/static/index.html#all-articles">All Articles</a></li>
+        <li><a href="/static/summaries.html" class="active">Summaries</a></li>
+      </ul>
     </div>
+  </nav>
 
-    <!-- Main content -->
-    <div class="w3-main" style="margin-left:300px">
+  <!-- Page header -->
+  <div class="page-header">
+    <p class="page-header__eyebrow">Gemini AI · Digest</p>
+    <h1 class="page-header__title">Trend<br>Summaries.</h1>
+    <p class="page-header__sub">AI-generated briefings of the latest news, written for software engineering students.</p>
+  </div>
 
-        <!-- Header -->
-        <header id="portfolio">
-            <a href="#">
-                <img src="/static/images/mkgrey.png" style="width:80px;"
-                    class="w3-right w3-margin w3-hide-large w3-hover-opacity">
-            </a>
-            <span class="w3-button w3-hide-large w3-xxlarge w3-hover-text-grey" onclick="w3_open()">
-                <i class="fa fa-bars"></i>
-            </span>
-            <div class="w3-container">
-                <h1><b>Tech News Tool</b></h1>
-                <div class="w3-section w3-bottombar w3-padding-16"></div>
-            </div>
-        </header>
+  <!-- Generate bar -->
+  <div class="generate-bar">
+    <button class="gen-btn" id="gen-btn" onclick="generateSummary()">Generate New Summary</button>
+    <span class="gen-note">Summarizes the 10 most recent articles using Gemini AI</span>
+  </div>
 
+  <!-- Summaries list -->
+  <div class="summaries-wrap">
+    <div id="spinner-wrap" class="spinner-wrap" style="display:none;">
+      <div class="spinner"></div>
+      <span class="spinner-label">Generating summary...</span>
+    </div>
+    <div id="summaries-list"></div>
+  </div>
 
-        <!--AI Summary-->
-        <div class="w3-container" style="margin-bottom:32px; padding-right:32px; padding-left:32px;"
-            id="all-summaries-container">
-            <!-- <button class="collapsible w3-teal" id="summary">All Summaries</button>
-            <div class="content">
-                <p id="ai-summary-text"></p>
-            </div> -->
-         
-        </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__logo">AI<span>Today</span></span>
+      <span class="footer__note">Built by MK · 2026</span>
+    </div>
+  </footer>
 
-       
-        <!-- All Articles cards (paginated) -->
-        <div id="all-articles-container" class="w3-row-padding"></div>
+  <script>
+    // ── Stored summaries (in-session) ──────────────────────────
+    // If you add a /summaries endpoint to your FastAPI later,
+    // replace this array with a fetch() call on page load.
+    let summaries = [];
 
-        <!-- Pagination bar -->
-        <div class="w3-center w3-padding-32">
-            <div class="w3-bar">
-                <!-- Buttons injected by buildPagination() in app.js -->
-            </div>
-        </div>
+    async function renderSummaries() {
+        const res  = await fetch('/all-summaries');
+        const data = await res.json();
+        summaries = data;
+      
+      const list = document.getElementById('summaries-list');
+      list.innerHTML = '';
 
-        <!-- Footer -->
-        <div class="w3-black w3-center w3-padding-24">- MK 2026 -</div>
+      if (!summaries.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">◈</div>
+            <p class="empty-state__text">No summaries yet.</p>
+            <p class="empty-state__sub">Click "Generate New Summary" to create your first briefing.</p>
+          </div>`;
+        return;
+      }
 
-    </div><!-- end .w3-main -->
+      summaries.forEach((s, i) => {
+        const card = document.createElement('div');
+        card.className = 'summary-card';
+        card.innerHTML = `
+          <div class="summary-card__meta">
+            <span class="summary-card__badge">AI Digest #${summaries.length - i}</span>
+            <span class="summary-card__date">${s[2]}</span>
+          </div>
+          <div class="summary-card__content">${marked.parse(s[1])}</div>`;
+        list.appendChild(card);
+      });
+    }
 
-    <script src="/static/app.js"></script>
+    async function generateSummary() {
+      const btn = document.getElementById('gen-btn');
+      const spinner = document.getElementById('spinner-wrap');
+
+      btn.disabled = true;
+      spinner.style.display = 'flex';
+
+      try {
+        // Calls your existing POST /summarize endpoint (or adapt to your route name)
+        const res  = await fetch('/ai-summary');
+        const data = await res.json();
+
+        if (data.ai_summary) {
+          summaries.unshift({
+            text: data.ai_summary,
+            date: new Date().toLocaleString('en-US', {
+              month: 'long', day: 'numeric', year: 'numeric',
+              hour: 'numeric', minute: '2-digit'
+            })
+          });
+          renderSummaries();
+        }
+      } catch (e) {
+        console.error('Summary generation failed:', e);
+      } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+      }
+    }
+
+    // Render empty state on load
+    renderSummaries();
+  </script>
 
 </body>
-
 </html>

@@ -138,14 +138,14 @@ def select_articles(conn=Depends(get_db_connection)):
     cursor.close()
     return {"articles": articles, "length": len(articles), "total": total, "last_fetch": fetch_state["last_fetch_time"], "trends_summary": fetch_state["trends_summary"], "new_articles": fetch_state["new_articles"], "ai_summary": fetch_state["ai_summary"]}
 
-@app.get("/articles/summary")
+@app.get("/ai-summary")
 def get_ai_summary(conn=Depends(get_db_connection)):
     """Calls ai_summarize function to summarize 10 most recent articles.
     """
     fetch_state["ai_summary"]=ai_summarize(conn)
     return {"ai_summary":fetch_state["ai_summary"]}
 
-@app.get("/summaries")
+@app.get("/all-summaries")
 def fetch_all_summaries(conn=Depends(get_db_connection)):
     """Fetch all ai summaries stored in database."""
     summaries = get_all_summaries(conn)

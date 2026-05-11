@@ -142,7 +142,7 @@ def summarize_trends(articles):
     # Get top 10 words
     top_words = word_counts.most_common(10)
     
-    summary = "\nTop trending words in titles:\n"
+    summary = ""
     for word, count in top_words:
         summary += f"- {word}: {count} times\n"
     

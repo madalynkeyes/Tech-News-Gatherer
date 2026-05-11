@@ -1,171 +1,1002 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech News Tool</title>
-    <link rel="icon" type="image/x-icon" href="/static/images/mkwhite.png">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        body,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: "Raleway", sans-serif;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Today — Tech News Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <style>
+    /* ── Reset & Tokens ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #0d0d0d;
+      --ink-mid:  #444;
+      --ink-soft: #888;
+      --paper:    #fafaf8;
+      --paper-2:  #f2f1ee;
+      --accent:   #c84b31;
+      --accent-2: #1a3a2a;
+      --rule:     #dddbd6;
+      --ff-serif: 'Playfair Display', Georgia, serif;
+      --ff-sans:  'DM Sans', system-ui, sans-serif;
+      --ff-mono:  'DM Mono', monospace;
+      --nav-h:    64px;
+      --max-w:    1200px;
+      --gutter:   clamp(16px, 4vw, 48px);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--ff-sans);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; object-fit: cover; }
+    button { cursor: pointer; font-family: var(--ff-sans); }
+
+    /* ── Sticky Nav ─────────────────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--nav-h);
+      background: rgba(250, 250, 248, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--gutter);
+    }
+
+    .nav__inner {
+      width: 100%;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav__logo {
+      font-family: var(--ff-serif);
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .nav__logo span { color: var(--accent); }
+
+    .nav__links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav__links a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      transition: color 0.2s;
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .nav__links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.25s ease;
+    }
+
+    .nav__links a:hover { color: var(--ink); }
+    .nav__links a:hover::after, .nav__links a.active::after { width: 100%; }
+    .nav__links a.active { color: var(--ink); }
+
+    .nav__cta {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 9px 20px;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 2px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .nav__cta:hover { background: var(--accent); }
+
+    /* ── Hero ───────────────────────────────────────────────────── */
+    .hero {
+      min-height: calc(70vh - var(--nav-h));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(60px, 10vw, 120px) var(--gutter) clamp(40px, 6vw, 80px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 80%, rgba(200,75,49,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(26,58,42,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--ff-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero__eyebrow::before, .hero__eyebrow::after {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .hero__headline {
+      font-family: var(--ff-serif);
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      max-width: 900px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero__headline em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero__sub {
+      font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+      color: var(--ink-mid);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero__meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-family: var(--ff-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+    }
+
+    .hero__meta-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ── Section Label ──────────────────────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 2px solid var(--ink);
+      border-bottom: 1px solid var(--rule);
+      padding: 10px 0;
+      margin-bottom: 28px;
+    }
+
+    .section-label__title {
+      font-family: var(--ff-sans);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .section-label__link {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .section-label__link:hover { text-decoration: underline; }
+
+    /* ── Page Wrapper ───────────────────────────────────────────── */
+    .page {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+
+    /* ── Divider ────────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 48px 0;
+    }
+
+    /* ── Hero Feature Grid (top articles) ──────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 2px;
+      background: var(--rule);
+      margin-bottom: 2px;
+    }
+
+    .feature-grid__main {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      background: var(--paper);
+      position: relative;
+    }
+
+    .feature-grid__main img {
+      height: 480px;
+      transition: transform 0.5s ease;
+    }
+
+    .feature-grid__main:hover img { transform: scale(1.02); }
+
+    .feature-grid__side {
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-grid__side img {
+      height: 220px;
+      transition: transform 0.5s ease;
+    }
+
+    .feature-grid__side:hover img { transform: scale(1.02); }
+
+    .feature-card {
+      overflow: hidden;
+    }
+
+    .feature-card__img-wrap {
+      overflow: hidden;
+    }
+
+    .feature-card__body {
+      padding: 16px 20px 20px;
+    }
+
+    .feature-card__source {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .feature-card__title {
+      font-family: var(--ff-serif);
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 8px;
+      transition: color 0.2s;
+    }
+
+    .feature-card:hover .feature-card__title { color: var(--accent); }
+
+    .feature-card__title--lg { font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
+    .feature-card__title--sm { font-size: 1.2rem; }
+
+    .feature-card__date {
+      font-family: var(--ff-mono);
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+    }
+
+    /* ── Strip of 4 ─────────────────────────────────────────────── */
+    .strip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--rule);
+      margin-bottom: 48px;
+    }
+
+    .strip-card {
+      background: var(--paper);
+      overflow: hidden;
+    }
+
+    .strip-card__img-wrap { overflow: hidden; }
+
+    .strip-card img {
+      height: 180px;
+      transition: transform 0.5s ease;
+    }
+
+    .strip-card:hover img { transform: scale(1.04); }
+
+    .strip-card__body { padding: 14px 16px 18px; }
+
+    .strip-card__source {
+      font-family: var(--ff-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+
+    .strip-card__title {
+      font-family: var(--ff-serif);
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 6px;
+      transition: color 0.2s;
+    }
+
+    .strip-card:hover .strip-card__title { color: var(--accent); }
+
+    .strip-card__date {
+      font-family: var(--ff-mono);
+      font-size: 0.6rem;
+      color: var(--ink-soft);
+    }
+
+    /* ── Stats Bar ──────────────────────────────────────────────── */
+    #stats {
+      background: var(--accent-2);
+      color: #e8ede9;
+      padding: 48px var(--gutter);
+    }
+
+    .stats-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+
+    .stats-label {
+      font-family: var(--ff-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(232,237,233,0.5);
+      margin-bottom: 32px;
+      border-bottom: 1px solid rgba(232,237,233,0.15);
+      padding-bottom: 12px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .stat-block__num {
+      font-family: var(--ff-serif);
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .stat-block__label {
+      font-family: var(--ff-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(232,237,233,0.5);
+      margin-top:10px;
+    }
+
+    .stats-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 24px;
+      border-top: 1px solid rgba(232,237,233,0.15);
+    }
+
+    .stats-btn {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border: 1px solid rgba(232,237,233,0.3);
+      background: transparent;
+      color: #e8ede9;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .stats-btn:hover { background: rgba(232,237,233,0.1); }
+    .stats-btn--primary { background: var(--accent); border-color: var(--accent); }
+    .stats-btn--primary:hover { background: #b03d25; border-color: #b03d25; }
+
+    .trends-box {
+      margin-top: 32px;
+      padding: 24px;
+      background: rgba(232,237,233,0.05);
+      border: 1px solid rgba(232,237,233,0.1);
+      border-radius: 2px;
+    }
+
+    .trends-box__label {
+      font-family: var(--ff-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(232,237,233,0.4);
+      margin-bottom: 12px;
+    }
+
+    .trends-box__content {
+      font-size: 0.85rem;
+      color: rgba(232,237,233,0.75);
+      line-height: 1.7;
+    }
+
+    #cleanup-result {
+      font-family: var(--ff-mono);
+      font-size: 0.7rem;
+      color: rgba(232,237,233,0.6);
+      margin-top: 8px;
+    }
+
+    /* ── All Articles ───────────────────────────────────────────── */
+    #all-articles { padding: 48px 0; }
+
+    .article-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .article-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--rule);
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    .article-row:hover { background: var(--paper-2); margin: 0 -16px; padding: 20px 16px; }
+
+    .article-row__img-wrap { overflow: hidden; border-radius: 1px; }
+    .article-row__img-wrap img { height: 90px; transition: transform 0.4s ease; }
+    .article-row:hover .article-row__img-wrap img { transform: scale(1.06); }
+
+    .article-row__no-img {
+      height: 90px;
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .article-row__no-img-icon {
+      font-size: 1.5rem;
+      opacity: 0.2;
+    }
+
+    .article-row__source {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .article-row__title {
+      font-family: var(--ff-serif);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .article-row__summary {
+      font-size: 0.8rem;
+      color: var(--ink-mid);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .article-row__date {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      color: var(--ink-soft);
+      margin-top: 6px;
+    }
+
+    /* ── Pagination ─────────────────────────────────────────────── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 40px 0;
+    }
+
+    .page-btn {
+      min-width: 36px;
+      height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      color: var(--ink-mid);
+      font-family: var(--ff-mono);
+      font-size: 0.72rem;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+
+    .page-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .page-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    .footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.4);
+      padding: 48px var(--gutter);
+    }
+
+    .footer__inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer__logo {
+      font-family: var(--ff-serif);
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .footer__logo span { color: var(--accent); }
+
+    .footer__note {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Loader ─────────────────────────────────────────────────── */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(250,250,248,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s;
+    }
+
+    .loader-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 8px solid var(--rule);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Placeholder shimmer ────────────────────────────────────── */
+    .shimmer {
+      background: linear-gradient(90deg, var(--paper-2) 25%, var(--rule) 50%, var(--paper-2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-grid__main { grid-row: auto; }
+      .strip-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .nav__links { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .strip-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr; }
+      .article-row { grid-template-columns: 100px 1fr; }
+    }
+  </style>
 </head>
+<body>
 
-<body class="w3-light-grey w3-content" style="max-width:1600px">
+  <!-- Loader -->
+  <div class="loader-overlay" id="loader">
+    <div class="loader-spinner"></div>
+  </div>
 
-    <!-- Sidebar -->
-    <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar">
-        <br>
-        <div class="w3-container">
-            <a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-jumbo w3-padding w3-hover-grey"
-                title="close menu">
-                <i class="fa fa-remove"></i>
-            </a>
-            <a href="/static/index.html">
-            <img src="/static/images/mkwhite.png" style="width:45%;" class="w3-round w3-hover-opacity"></a><br><br>
-            <h4><b>TECH NEWS</b></h4>
-            <p class="w3-text-grey">Template by W3.CSS</p>
-        </div>
-        <div class="w3-bar-block">
-            <a id="nav-latest" href="#latest-container" onclick="w3_close(); setActiveNav('nav-latest')"
-                class="w3-bar-item w3-button w3-padding w3-text-teal">
-                <i class="fa fa-newspaper-o fa-fw w3-margin-right"></i>Latest Articles
-            </a>
-            <a id="nav-recent" href="#recent-stats-container" onclick="w3_close(); setActiveNav('nav-recent')"
-                class="w3-bar-item w3-button w3-padding">
-                <i class="fa fa-folder-open fa-fw w3-margin-right"></i>Recent Stats
-            </a>
-            <a id="nav-summary" href="#ai-summary-container" onclick="w3_close(); setActiveNav('nav-summary')"
-                class="w3-bar-item w3-button w3-padding">
-                <i class="fa fa-lightbulb-o fa-fw w3-margin-right"></i>AI Summary
-            </a>
-            <a id="nav-all" href="#all-articles-container" onclick="w3_close(); setActiveNav('nav-all')"
-                class="w3-bar-item w3-button w3-padding">
-                <i class="fa fa-th-large fa-fw w3-margin-right"></i>All Articles
-            </a>
-            <a id="nav-summaries" href="/static/summaries.html" onclick="w3_close(); setActiveNav('nav-summaries')"
-                class="w3-bar-item w3-button w3-padding">
-                <i class="fa fa-book fa-fw w3-margin-right"></i>All Summaries</a>
-        </div>
-    </nav>
+  <!-- ── Nav ──────────────────────────────────────────────────── -->
+  <nav class="nav">
+    <div class="nav__inner">
+      <a href="#" class="nav__logo">AI<span>Today</span></a>
+      <ul class="nav__links">
+        <li><a href="#home" class="active" onclick="setActiveNav(this)">Home</a></li>
+        <li><a href="#stats" onclick="setActiveNav(this)">Stats</a></li>
+        <li><a href="#all-articles" onclick="setActiveNav(this)">All Articles</a></li>
+        <li><a href="/static/summaries.html" onclick="setActiveNav(this)">Summaries</a></li>
+      </ul>
+      <button class="nav__cta" onclick="triggerFetch()">Refresh Feed</button>
+    </div>
+  </nav>
 
-    <!-- Overlay (mobile) -->
-    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer"
-        title="close side menu" id="myOverlay"></div>
+  <!-- ── Hero ─────────────────────────────────────────────────── -->
+  <section class="hero" id="home">
+    <p class="hero__eyebrow">AI &amp; Tech Intelligence</p>
+    <h1 class="hero__headline">Stay sharp.<br><em>Learn AI.</em></h1>
+    <p class="hero__sub">Curated AI and tech news, fetched automatically every two hours from the sources that matter.</p>
+    <div class="hero__meta">
+      <span class="hero__meta-dot"></span>
+      <span id="hero-last-fetch">Loading feed...</span>
+      <span>·</span>
+      <span id="hero-total">— articles</span>
+    </div>
+  </section>
 
-    <!-- Full-screen loader -->
-    <div class="loader-overlay" id="loader">
-        <div class="spinner"></div>
+  <!-- ── Latest Articles ───────────────────────────────────────── -->
+  <main class="page">
+
+    <div class="section-label">
+      <span class="section-label__title">Latest</span>
+      <a class="section-label__link" href="#all-articles">See all →</a>
     </div>
 
-    <!-- Main content -->
-    <div class="w3-main" style="margin-left:300px">
+    <!-- Feature 2-column grid -->
+    <div class="feature-grid" id="feature-grid">
+      <!-- injected by JS -->
+    </div>
 
-        <!-- Header -->
-        <header id="portfolio">
-            <a href="#">
-                <img src="/static/images/mkgrey.png" style="width:80px;"
-                    class="w3-right w3-margin w3-hide-large w3-hover-opacity">
-            </a>
-            <span class="w3-button w3-hide-large w3-xxlarge w3-hover-text-grey" onclick="w3_open()">
-                <i class="fa fa-bars"></i>
-            </span>
-            <div class="w3-container">
-                <h1><b>Tech News Tool</b></h1>
-                <div class="w3-section w3-bottombar w3-padding-16"></div>
-            </div>
-        </header>
+    <!-- Strip of 4 -->
+    <div class="strip-grid" id="strip-grid" style="margin-top:2px;">
+      <!-- injected by JS -->
+    </div>
 
-        <!-- Latest Articles -->
-        <div class="w3-container" id="latest-container" style="margin-bottom:5px">
-            <p>Welcome to the Tech News Tool! This application fetches the latest tech news articles specifically about
-                AI from various RSS feeds, filters them based on keywords, and stores them in a database for easy
-                access. Gemini AI takes the latest 10 articles and creates a simplified summary of the top
-                technology advancements of AI. To generate a new summary of the latest articles, click the "Generate AI
-                Summary" button. This application is updated every two hours but can also be updated by clicking
-                "Fetch Newest Articles" button below. Articles older than 7 days are automatically removed from the database and
-                can also be removed immediately by clicking the "Cleanup Database" button below.</p>
-            <h2 style="padding-left:8px"><b>Top 6 Latest Articles</b></h2>
-            <div class="w3-row-padding" id="latest-1"></div>
-            <div class="w3-row-padding" id="latest-2"></div>
+    <hr class="divider" />
+
+    <!-- ── Stats Section ─────────────────────────────────────────── -->
+    </main>
+
+    <section id="stats">
+      <div class="stats-inner">
+        <p class="stats-label">Feed Statistics</p>
+        <div class="stats-row">
+          <div class="stat-block">
+            <div class="stat-block__num" id="stat-total">—</div>
+            <div class="stat-block__label">Articles stored</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-block__num" id="stat-new">—</div>
+            <div class="stat-block__label">Added last fetch</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-block__num" id="stat-sources">4</div>
+            <div class="stat-block__label">Active sources</div>
+          </div>
         </div>
-
-        <!-- Recent Stats -->
-        <div class="w3-container" id="recent-stats-container"
-            style="margin-bottom:32px; padding-right:32px; padding-left:32px;">
-            <div class="w3-col m6" style="padding-top:16px;">
-                <h2><b>Recent Stats</b></h2>
-                <p id="articles-found"></p>
-                <p id="last-fetch"></p>
-                <p id="new-articles"></p>
-                <button class="w3-button w3-teal w3-margin-top" onclick="fetchArticles()"
-                    style="width: 183.25px; margin-top:-10px">
-                    Fetch Newest Articles
-                </button>
-                <button class="w3-button w3-grey w3-margin-top" onclick="runCleanup()"
-                    style="width:183.25px; margin-top:-10px">
-                    Cleanup Database
-                </button>
-
-                <div>
-                    <button class="w3-button w3-black" style="width: 183.25px; margin-top:5px;"
-                        onclick="generateSummary()">Generate AI Summary</button>
-                </div>
-                <p id="cleanup-result"></p>
-
-            </div>
-            <div class="w3-col m6 w3-grey w3-text-white" style="padding:16px;">
-                <h2><b>Trends Summary</b></h2>
-                <p id="common-trends"></p>
-            </div>
-            <hr>
+        <div class="stats-actions">
+          <button class="stats-btn stats-btn--primary" onclick="triggerFetch()">Fetch Now</button>
+          <button class="stats-btn" onclick="runCleanup()">Cleanup Old Articles</button>
         </div>
+        <p id="cleanup-result"></p>
+        <div class="trends-box" id="trends-box" style="display:none;">
+          <p class="trends-box__label">Trending Topics</p>
+          <div class="trends-box__content" id="trends-content"></div>
+        </div>
+      </div>
+    </section>
 
-        <!--AI Summary-->
-        <div class="w3-container" style="margin-bottom:32px; padding-right:32px; padding-left:32px;"
-            id="ai-summary-container">
-            <button class="collapsible" style="font-size: 30px;">GEMINI AI Summary</button>
-            <div class="content">
-                <p id="ai-summary"></p>
+    <!-- ── All Articles ─────────────────────────────────────────── -->
+    <main class="page">
+    <section id="all-articles">
+      <div class="section-label">
+        <span class="section-label__title">All Articles</span>
+        <span class="section-label__link" id="article-count-label"></span>
+      </div>
+      <div class="article-list" id="article-list"></div>
+      <div class="pagination" id="pagination"></div>
+    </section>
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__logo">AI<span>Today</span></span>
+      <span class="footer__note">Built by MK · 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── State ──────────────────────────────────────────────────
+    const PAGE_SIZE = 15;
+    let currentPage = 0;
+    let allArticles = [];
+    const loader = document.getElementById('loader');
+
+    // ── Nav ────────────────────────────────────────────────────
+    function setActiveNav(el) {
+      document.querySelectorAll('.nav__links a').forEach(a => a.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // ── Image helper ───────────────────────────────────────────
+    function getFallback(source = '') {
+      const s = source.toLowerCase();
+      if (s.includes('techcrunch')) return '/static/images/techcrunch.jpg';
+    //   if (s.includes('wired'))      return '/static/images/wired.jpg';
+    //   if (s.includes('hacker'))     return '/static/images/hackernews.jpg';
+      return '/static/images/ainews1.png';
+    }
+
+    function imgEl(article, height) {
+      const src = article.image_url || getFallback(article.source);
+      return `<img src="${src}" alt="${article.title}" style="height:${height}px;" onerror="this.src='${getFallback('')}'">`;
+    }
+
+    // ── Date helper ────────────────────────────────────────────
+    function fmtDate(d) {
+      if (!d) return '';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // ── Render feature grid (top 6) ────────────────────────────
+    function renderFeatureGrid(articles) {
+      const grid = document.getElementById('feature-grid');
+      grid.innerHTML = '';
+
+      if (!articles.length) return;
+
+      // Main (left, tall)
+      const main = articles[0];
+      grid.innerHTML += `
+        <a href="${main.link}" target="_blank" class="feature-card feature-grid__main">
+          <div class="feature-card__img-wrap">${imgEl(main, 480)}</div>
+          <div class="feature-card__body">
+            <p class="feature-card__source">${main.source}</p>
+            <h2 class="feature-card__title feature-card__title--lg">${main.title}</h2>
+            <p class="feature-card__date">${fmtDate(main.published)}</p>
+          </div>
+        </a>`;
+
+      // Right side (2 stacked)
+      const sideWrap = document.createElement('div');
+      sideWrap.style.cssText = 'display:grid;grid-template-rows:1fr 1fr;gap:2px;';
+      [articles[1], articles[2]].forEach(a => {
+        if (!a) return;
+        const div = document.createElement('a');
+        div.href = a.link;
+        div.target = '_blank';
+        div.className = 'feature-card feature-grid__side';
+        div.innerHTML = `
+          <div class="feature-card__img-wrap">${imgEl(a, 220)}</div>
+          <div class="feature-card__body">
+            <p class="feature-card__source">${a.source}</p>
+            <h3 class="feature-card__title feature-card__title--sm">${a.title}</h3>
+            <p class="feature-card__date">${fmtDate(a.published)}</p>
+          </div>`;
+        sideWrap.appendChild(div);
+      });
+      grid.appendChild(sideWrap);
+    }
+
+    // ── Render strip of 4 ──────────────────────────────────────
+    function renderStrip(articles) {
+      const strip = document.getElementById('strip-grid');
+      strip.innerHTML = '';
+      articles.forEach(a => {
+        strip.innerHTML += `
+          <a href="${a.link}" target="_blank" class="strip-card">
+            <div class="strip-card__img-wrap">${imgEl(a, 180)}</div>
+            <div class="strip-card__body">
+              <p class="strip-card__source">${a.source}</p>
+              <h4 class="strip-card__title">${a.title}</h4>
+              <p class="strip-card__date">${fmtDate(a.published)}</p>
             </div>
-         
-        </div>
+          </a>`;
+      });
+    }
 
-        <!-- All Articles heading -->
-        <div class="w3-container" style="padding-left:32px;">
-            <h2><b>All Articles</b></h2>
-        </div>
+    // ── Render article list (paginated) ───────────────────────
+    function renderPage(page) {
+      const list = document.getElementById('article-list');
+      list.innerHTML = '';
+      const start = page * PAGE_SIZE;
+      const slice = allArticles.slice(start, start + PAGE_SIZE);
 
-        <!-- All Articles cards (paginated) -->
-        <div id="all-articles-container" class="w3-row-padding"></div>
+      slice.forEach(a => {
+        const imgHtml = a.image_url
+          ? `<div class="article-row__img-wrap"><img src="${a.image_url}" alt="${a.title}" onerror="this.parentElement.innerHTML='<div class=article-row__no-img><span class=article-row__no-img-icon>◈</span></div>'"></div>`
+          : `<div class="article-row__no-img"><span class="article-row__no-img-icon">◈</span></div>`;
 
-        <!-- Pagination bar -->
-        <div class="w3-center w3-padding-32">
-            <div class="w3-bar">
-                <!-- Buttons injected by buildPagination() in app.js -->
-            </div>
-        </div>
+        const row = document.createElement('a');
+        row.href = a.link;
+        row.target = '_blank';
+        row.className = 'article-row';
+        row.innerHTML = `
+          ${imgHtml}
+          <div>
+            <p class="article-row__source">${a.source}</p>
+            <p class="article-row__title">${a.title}</p>
+            <p class="article-row__summary">${a.summary || ''}</p>
+            <p class="article-row__date">${fmtDate(a.published)}</p>
+          </div>`;
+        list.appendChild(row);
+      });
 
-        <!-- Footer -->
-        <div class="w3-black w3-center w3-padding-24">- MK 2026 -</div>
+      currentPage = page;
+      buildPagination();
+    }
 
-    </div><!-- end .w3-main -->
+    // ── Pagination ────────────────────────────────────────────
+    function buildPagination() {
+      const total = Math.ceil(allArticles.length / PAGE_SIZE);
+      const pg = document.getElementById('pagination');
+      pg.innerHTML = '';
 
-    <script src="/static/app.js"></script>
+      const prev = document.createElement('button');
+      prev.className = 'page-btn';
+      prev.textContent = '←';
+      prev.disabled = currentPage === 0;
+      prev.onclick = () => { renderPage(currentPage - 1); scrollToArticles(); };
+      pg.appendChild(prev);
 
+      const start = Math.max(0, currentPage - 2);
+      const end   = Math.min(total, start + 5);
+      for (let i = start; i < end; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+        btn.textContent = i + 1;
+        btn.onclick = ((p) => () => { renderPage(p); scrollToArticles(); })(i);
+        pg.appendChild(btn);
+      }
+
+      const next = document.createElement('button');
+      next.className = 'page-btn';
+      next.textContent = '→';
+      next.disabled = currentPage >= total - 1;
+      next.onclick = () => { renderPage(currentPage + 1); scrollToArticles(); };
+      pg.appendChild(next);
+    }
+
+    function scrollToArticles() {
+      document.getElementById('all-articles').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── Stats ─────────────────────────────────────────────────
+    function renderStats(data) {
+      document.getElementById('stat-total').textContent = data.total ?? '—';
+      document.getElementById('stat-new').textContent   = data.new_articles ?? '—';
+      document.getElementById('hero-total').textContent = `${data.total ?? '—'} articles`;
+      document.getElementById('article-count-label').textContent = `${allArticles.length} total`;
+
+      if (data.last_fetch) {
+        document.getElementById('hero-last-fetch').textContent =
+          'Updated ' + new Date(data.last_fetch).toLocaleString();
+        document.getElementById('cleanup-result').textContent = 'Last Updated ' +new Date(data.last_fetch).toLocaleString();
+      }
+
+      if (data.trends_summary) {
+        document.getElementById('trends-box').style.display = 'block';
+        document.getElementById('trends-content').style = "margin-left:10px";
+        document.getElementById('trends-content').innerHTML =
+          marked.parse(data.trends_summary);
+      }
+    }
+
+    // ── Load ──────────────────────────────────────────────────
+    async function loadArticles() {
+      try {
+        const res  = await fetch('/articles');
+        const data = await res.json();
+        allArticles = data.articles || [];
+
+        renderFeatureGrid(allArticles.slice(0, 3));
+        renderStrip(allArticles.slice(3, 7));
+        renderPage(0);
+        renderStats(data);
+      } catch (e) {
+        console.error('Failed to load articles:', e);
+      }
+    }
+
+    // ── Fetch trigger ─────────────────────────────────────────
+    async function triggerFetch() {
+      loader.classList.remove('hidden');
+      try {
+        await fetch('/fetch');
+        await loadArticles();
+      } finally {
+        loader.classList.add('hidden');
+      }
+    }
+
+    // ── Cleanup ───────────────────────────────────────────────
+    async function runCleanup() {
+      const res  = await fetch('/cleanup', { method: 'POST' });
+      const data = await res.json();
+      document.getElementById('cleanup-result').textContent = data.message;
+    }
+
+    // ── Init ──────────────────────────────────────────────────
+    loadArticles();
+    window.addEventListener('load', () => loader.classList.add('hidden'));
+  </script>
 </body>
-
 </html>
