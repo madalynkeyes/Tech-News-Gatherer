@@ -15,18 +15,22 @@ from google import genai
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
 
 FEEDS = [
     "https://techcrunch.com/category/artificial-intelligence/feed",
     "https://www.wired.com/feed/tag/ai/latest/rss",
     "https://www.artificialintelligence-news.com/feed/rss/",
-    "https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml"
+    "https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml",
+    "https://blog.google/innovation-and-ai/technology/ai/rss/"
 
 ]
 
 KEYWORDS = ["ai", "artificial intelligence", "startup", "machine learning", "llm", "software"]
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+seen_urls = set() #keeps track of the URLS we have already seen since starting the app
 
 def fetch_articles(feeds):
     """Download and deduplicate articles from RSS feeds.
@@ -38,7 +42,6 @@ def fetch_articles(feeds):
         A list of article dictionaries containing title, link, summary,
         source, and published date.
     """
-    seen_urls = set()   # tracks URLs we've already collected
     articles = []       # final deduplicated list for printing
 
     for url in feeds:
@@ -54,8 +57,10 @@ def fetch_articles(feeds):
                 image = entry.get("media_thumbnail", [{}])[0].get("url", "")
             elif 'enclosures' in entry and entry.enclosures:
                 image = entry.enclosures[0].get("href", "")
+            elif entry.get("media_content"):
+                image = entry.get("media_content",[{}])[0].get("url", "")
             else:
-                image = None
+                image = get_article_image(link)
 
             seen_urls.add(link)
             articles.append({
@@ -69,6 +74,40 @@ def fetch_articles(feeds):
             })
 
     return articles
+
+def get_article_image(url):
+    """For RSS feeds that don't have images, we use webscraper to grab image thumbnail.
+    
+    Args: 
+        url: a RSS feed URL
+
+    Returns:
+        a webscraped image from article or nothing if no image in article
+    """
+    image = scrape_og_image(url)
+    if image:
+        return image
+    else:
+        return None 
+    
+def scrape_og_image(url):
+    """Use webscraper to grab main image from article at specific URL. 
+
+    Uses BeautifulSoup4 webscraper which parses html of article to grab og:image.
+    
+    Args: 
+        url: a RSS feed URL
+
+    Returns:
+        a webscraped image from article or nothing if no image in article
+    """
+    try:
+        res = requests.get(url, timeout=5, headers={"User-Agent": "Mozilla/5.0"})
+        soup = BeautifulSoup(res.text, "html.parser")
+        tag = soup.find("meta", property="og:image")
+        return tag["content"] if tag else None
+    except:
+        return None
 
 def convert_published_date(published_parsed):
     """Convert a parsed RSS date to MySQL datetime format.

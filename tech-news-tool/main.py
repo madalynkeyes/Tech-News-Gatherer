@@ -151,15 +151,17 @@ def fetch_all_summaries(conn=Depends(get_db_connection)):
     summaries = get_all_summaries(conn)
     return summaries
 
-@app.get("/fetch")
+@app.post("/fetch")
 def fetch_and_store_articles(conn=Depends(get_db_connection)):
     """Fetch new RSS articles, filter them, and save matching ones.
 
     This endpoint triggers the same storage behavior as the startup task,
     fetching RSS feeds, filtering by keywords, and inserting new articles.
     """
-    daily_fetch_and_store()
     stats = save_filtered_articles(conn)
+    # fetch_state["last_fetch_time"] = datetime.now()
+    # fetch_state["trends_summary"]  = stats[3]
+    # fetch_state["new_articles"]    = stats[2]
     return {"message": "Articles fetched and stored successfully.", "stats": stats}
 
 @app.post("/cleanup")

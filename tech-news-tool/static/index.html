@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Today — Tech News Tool</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+  <link rel="manifest" href="/static/images/site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -813,7 +817,8 @@
     function fmtDate(d) {
       if (!d) return '';
       const dt = new Date(d);
-      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      
+      return dt.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour:"numeric",minute:"2-digit"});
     }
 
     // ── Render feature grid (top 6) ────────────────────────────
@@ -881,6 +886,11 @@
       const slice = allArticles.slice(start, start + PAGE_SIZE);
 
       slice.forEach(a => {
+        if(a.source=="Feed: Artificial Intelligence Latest") {
+            a.source = "Wired";
+        } else if (a.source == "AI") {
+            a.source = "Google Blog";
+        }
         const imgHtml = a.image_url
           ? `<div class="article-row__img-wrap"><img src="${a.image_url}" alt="${a.title}" onerror="this.parentElement.innerHTML='<div class=article-row__no-img><span class=article-row__no-img-icon>◈</span></div>'"></div>`
           : `<div class="article-row__no-img"><span class="article-row__no-img-icon">◈</span></div>`;
@@ -980,7 +990,7 @@
     async function triggerFetch() {
       loader.classList.remove('hidden');
       try {
-        await fetch('/fetch');
+        await fetch('/fetch', {method: 'POST'});
         await loadArticles();
       } finally {
         loader.classList.add('hidden');
