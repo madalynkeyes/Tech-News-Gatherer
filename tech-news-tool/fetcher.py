@@ -32,11 +32,30 @@ load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 seen_urls = set() #keeps track of the URLS we have already seen since starting the app
 
-def fetch_articles(feeds):
+def link_in_db(conn, link_hash):
+    """Checks if hashed link is already in database.
+
+    If hashed link already in database we can skip it in the feeds.
+    
+    Args:
+        conn: An open MySQL connection object.
+        link_hash: the hashed url for an article.
+    
+    Returns:
+        Boolean of if link_hash already exists in database.
+        """
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM articles WHERE link_hash = %s",(link_hash,))
+    result = cursor.fetchone()
+    cursor.close()
+    return result is not None
+
+def fetch_articles(feeds, conn):
     """Download and deduplicate articles from RSS feeds.
 
     Args:
         feeds: A list of RSS feed URLs.
+        conn: An open MySQL connection object.
 
     Returns:
         A list of article dictionaries containing title, link, summary,
@@ -50,7 +69,13 @@ def fetch_articles(feeds):
         for entry in feed.entries:
             link = entry.get("link", "")
 
-            # skip if we've seen this URL before
+            hashed = hash_url(link)
+
+            #skip if that article is already in database
+            if link_in_db(conn, hashed):
+                continue
+
+            # skip if we've seen this URL before (if two sources point to same url)
             if link in seen_urls:
                 continue
             if entry.get("media_thumbnail"):
@@ -61,6 +86,7 @@ def fetch_articles(feeds):
                 image = entry.get("media_content",[{}])[0].get("url", "")
             else:
                 image = get_article_image(link)
+                print(image)
 
             seen_urls.add(link)
             articles.append({
@@ -244,7 +270,7 @@ def save_filtered_articles(conn):
     """
     new_articles = 0
     mycursor = conn.cursor()
-    all_articles = fetch_articles(FEEDS)
+    all_articles = fetch_articles(FEEDS,conn)
     filtered = filter_by_keywords(all_articles, KEYWORDS)
     for article in filtered:
         new_articles += insert_article(conn, article)
