@@ -46,6 +46,18 @@ fetch_state = {
     "ai_summary":"No new articles to summarize"
 }
 
+daily_rpd_counter = 20
+
+def subtract_rpd():
+    global daily_rpd_counter
+    daily_rpd_counter -= 1
+    print(f"Gemini API request sent. Remaining requests: {daily_rpd_counter}")
+
+def reset_rpd_conter():
+    global daily_rpd_counter
+    daily_rpd_counter = 20
+    print("Resetting daily rpd count to 20.")
+
 def weekly_cleanup():
     """Delete articles older than 7 days from the database.
 
@@ -90,7 +102,8 @@ async def lifespan(app: FastAPI):
         misfire_grace_time=3600,
         coalesce=True
     )
-    scheduler.add_job(weekly_cleanup, IntervalTrigger(days=7),misfire_grace_time=3600,coalesce=True) 
+    scheduler.add_job(weekly_cleanup, IntervalTrigger(days=7),misfire_grace_time=3600,coalesce=True)
+    scheduler.add_job(reset_rpd_conter,'cron',hour=8,minute=0) #rpd resets everyday at 8am
     scheduler.start()
 
     yield
@@ -142,14 +155,18 @@ def select_articles(conn=Depends(get_db_connection)):
 def get_ai_summary(conn=Depends(get_db_connection)):
     """Calls ai_summarize function to summarize 10 most recent articles.
     """
-    fetch_state["ai_summary"]=ai_summarize(conn)
-    return {"ai_summary":fetch_state["ai_summary"]}
+    if (daily_rpd_counter>0):
+        fetch_state["ai_summary"]=ai_summarize(conn)
+        subtract_rpd()
+    else:
+        fetch_state["ai_summary"] = "Already used your 20 daily summaries. Please try again tomorrow."
+    return {"ai_summary":fetch_state["ai_summary"],"rpd_counter":daily_rpd_counter}
 
 @app.get("/all-summaries")
 def fetch_all_summaries(conn=Depends(get_db_connection)):
     """Fetch all ai summaries stored in database."""
     summaries = get_all_summaries(conn)
-    return summaries
+    return {"summaries":summaries,"rpd_counter":daily_rpd_counter}
 
 @app.post("/fetch")
 def fetch_and_store_articles(conn=Depends(get_db_connection)):

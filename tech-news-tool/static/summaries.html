@@ -274,7 +274,10 @@
   <!-- Generate bar -->
   <div class="generate-bar">
     <button class="gen-btn" id="gen-btn" onclick="generateSummary()">Generate New Summary</button>
-    <span class="gen-note">Summarizes the 10 most recent articles using Gemini AI</span>
+    <span class="gen-note">
+        <p id="gen-desc">Summarizes the 10 most recent articles using Gemini AI</p>
+        <p id="rpd-count"></p>
+    </span>
   </div>
 
   <!-- Summaries list + pagination -->
@@ -415,7 +418,11 @@
       try {
         const res  = await fetch('/all-summaries');
         const data = await res.json();
-        summaries  = data;
+        let rpd_counter = data.rpd_counter;
+        document.getElementById('rpd-count').textContent = `Daily Remaining Summaries: ${rpd_counter}/20`;
+       
+        
+        summaries  = data.summaries;
         renderPage(0);
       } catch (e) {
         console.error('Failed to load summaries:', e);
@@ -434,6 +441,16 @@
       try {
         const res  = await fetch('/ai-summary');
         const data = await res.json();
+
+         if(rpd_counter<=0){
+             const summary_wrap = document.getElementById('summaries-wrap');
+        const summary_warn = document.createElement('div');
+        summary_warn.textContent = "Already used your 20 daily summaries. Please try again tomorrow.";
+            // const spinner = document.getElementById('spinner-wrap');
+            // spinner.style.display = 'flex';
+            // // document.getElementById('spinner').style.display = 'none';
+            // document.getElementById('spinner-wrap').textContent = "Already used your 20 daily summaries. Please try again tomorrow.";
+        }
 
         if (data.ai_summary) {
           // Reload from the API so the new card gets its real DB timestamp
