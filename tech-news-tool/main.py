@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI,Depends
 from db import get_connection, create_articles_table, delete_old_articles, create_summaries_table, get_latest_summary, get_all_summaries
 from fetcher import save_filtered_articles, ai_summarize
-from datetime import datetime
+from datetime import datetime, timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi.staticfiles import StaticFiles
@@ -25,7 +25,7 @@ def daily_fetch_and_store():
     task that runs every 4 hours.
     """
     print(f"Running scheduled fetch at {datetime.now()}")
-    last_fetch_time = datetime.now()
+    last_fetch_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     conn = get_connection()
     create_articles_table(conn)
     if conn:
@@ -188,7 +188,8 @@ def fetch_and_store_articles(conn=Depends(get_db_connection)):
     """
     print(f"Running fetch at {datetime.now()}")
     stats = save_filtered_articles(conn)
-    fetch_state["last_fetch_time"] = datetime.now()
+    now_utc = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    fetch_state["last_fetch_time"] = now_utc
     fetch_state["trends_summary"]  = stats[3]
     fetch_state["new_articles"]    = stats[2]
     return {"message": "Articles fetched and stored successfully.", "stats": stats}
