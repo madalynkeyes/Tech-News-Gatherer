@@ -958,8 +958,8 @@
 
       if (data.last_fetch) {
         document.getElementById('hero-last-fetch').textContent =
-          'Updated ' + new Date(data.last_fetch).toLocaleString();
-        document.getElementById('cleanup-result').textContent = 'Last Updated ' +new Date(data.last_fetch).toLocaleString();
+          'Updated ' + fmtDate(data.last_fetch);
+        document.getElementById('cleanup-result').textContent = 'Last Updated ' + fmtDate(data.last_fetch);
       }
 
       if (data.trends_summary) {

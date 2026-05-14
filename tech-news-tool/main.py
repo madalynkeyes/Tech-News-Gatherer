@@ -12,7 +12,8 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi import HTTPException
 
 
 def daily_fetch_and_store():
@@ -127,8 +128,10 @@ def get_db_connection():
         yield conn
     except Exception as e:
         print(f"Error connecting to database: {e}")
+        raise
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
 @app.get("/")
 def read_root():
@@ -155,12 +158,20 @@ def select_articles(conn=Depends(get_db_connection)):
 def get_ai_summary(conn=Depends(get_db_connection)):
     """Calls ai_summarize function to summarize 10 most recent articles.
     """
-    if (daily_rpd_counter>0):
-        fetch_state["ai_summary"]=ai_summarize(conn)
-        subtract_rpd()
-    else:
-        fetch_state["ai_summary"] = "Already used your 20 daily summaries. Please try again tomorrow."
-    return {"ai_summary":fetch_state["ai_summary"],"rpd_counter":daily_rpd_counter}
+    try:
+        if (daily_rpd_counter>0):
+            fetch_state["ai_summary"]=ai_summarize(conn)
+            subtract_rpd()
+        else:
+            fetch_state["ai_summary"] = "Already used your 20 daily summaries. Please try again tomorrow."
+        return {"ai_summary":fetch_state["ai_summary"],"rpd_counter":daily_rpd_counter,"error": None}
+    except Exception as e:
+        error_message = str(e) 
+        #return 200 with an error rather than 500 so frontend JS can read it instead of crashing
+        return JSONResponse(
+            status_code=200,
+            content={"ai_summary":None,"rpd_counter":daily_rpd_counter,"error":error_message}
+        )
 
 @app.get("/all-summaries")
 def fetch_all_summaries(conn=Depends(get_db_connection)):
@@ -175,10 +186,11 @@ def fetch_and_store_articles(conn=Depends(get_db_connection)):
     This endpoint triggers the same storage behavior as the startup task,
     fetching RSS feeds, filtering by keywords, and inserting new articles.
     """
+    print(f"Running fetch at {datetime.now()}")
     stats = save_filtered_articles(conn)
-    # fetch_state["last_fetch_time"] = datetime.now()
-    # fetch_state["trends_summary"]  = stats[3]
-    # fetch_state["new_articles"]    = stats[2]
+    fetch_state["last_fetch_time"] = datetime.now()
+    fetch_state["trends_summary"]  = stats[3]
+    fetch_state["new_articles"]    = stats[2]
     return {"message": "Articles fetched and stored successfully.", "stats": stats}
 
 @app.post("/cleanup")

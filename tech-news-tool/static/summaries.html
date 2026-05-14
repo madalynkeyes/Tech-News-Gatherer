@@ -278,6 +278,7 @@
         <p id="gen-desc">Summarizes the 10 most recent articles using Gemini AI</p>
         <p id="rpd-count"></p>
         <p id="rpd-warning"></p>
+        <p id="gen-error" style="font-family:var(--ff-mono); font-size:0.7rem; color:var(--accent); width:100%; margin-top:4px;"></p>
     </span>
   </div>
 
@@ -433,13 +434,19 @@
     async function generateSummary() {
       const btn     = document.getElementById('gen-btn');
       const spinner = document.getElementById('spinner-wrap');
+      const errorEl = document.getElementById('gen-error');
 
       btn.disabled          = true;
       spinner.style.display = 'flex';
+      errorEl.textContent = ''; //clear any previous errors
 
       try {
         const res  = await fetch('/ai-summary');
         const data = await res.json();
+        if (data.error){
+          errorEl.textContent = `Could not generate summary: ${data.error}`;
+          return;
+        }
         let rpd_counter = data.rpd_counter;
         if(rpd_counter<=0){
             const summary_warn = document.getElementById('rpd-warning');
@@ -454,6 +461,7 @@
           scrollToTop();
         }
       } catch (e) {
+        errorEl.textContent = 'Network error — please try again.';
         console.error('Summary generation failed:', e);
       } finally {
         btn.disabled          = false;
