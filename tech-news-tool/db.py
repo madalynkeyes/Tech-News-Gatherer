@@ -23,6 +23,7 @@ def get_connection():
             password=os.getenv("DB_PASSWORD"),
             port=os.getenv("DB_PORT", 3306)
         )
+        temp_conn.cursor().execute("SET time_zone = '+00:00'")
         temp_conn.cursor().execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv('DB_NAME')}")
         temp_conn.close()
         

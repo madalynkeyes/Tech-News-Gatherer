@@ -136,19 +136,19 @@ def scrape_og_image(url):
         return None
 
 def convert_published_date(published_parsed):
-    """Convert a parsed RSS date to MySQL datetime format.
+    """Convert a parsed RSS date to ISO 8601 format with UTC timezone.
 
     Args:
         published_parsed: A time.struct_time object from feedparser.
 
     Returns:
-        A string formatted as 'YYYY-MM-DD HH:MM:SS', or None if no date.
+        A string formatted as 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601 UTC), or None if no date.
     """
-    from datetime import datetime
+    from datetime import datetime, timezone
     if published_parsed:
-        dt = datetime.fromtimestamp(time.mktime(published_parsed))
-        mysql_dt = dt.strftime('%Y-%m-%d %H:%M:%S')
-        return mysql_dt
+        dt = datetime.fromtimestamp(time.mktime(published_parsed), tz=timezone.utc)
+        iso_dt = dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+        return iso_dt
     return None
 
 def filter_by_keywords(articles, keywords):
@@ -245,6 +245,7 @@ def ai_summarize(conn):
     recent articles in a list and then generates an AI summary using 
     Gemini API model which will summarize the main updates in AI tech.
     """
+    from datetime import timezone
     all_articles = get_all_articles(conn)
     list_of_links = []
     for article in all_articles[:10]:
@@ -255,7 +256,8 @@ def ai_summarize(conn):
                   "Analyze these 10 most recent articles on AI innovations and please provide me with a short catchy simplified summary of the latest news on AI technology and how it would apply to a college software engineering student that is not aware of any technology changes."]
     )
     print(response.text)
-    insert_summary(conn,{"summary": response.text, "date":datetime.now()})
+    now_utc = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    insert_summary(conn,{"summary": response.text, "date": now_utc})
     return response.text
 
 def save_filtered_articles(conn):
