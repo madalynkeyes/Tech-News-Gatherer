@@ -191,7 +191,7 @@ def get_latest_summary(conn):
     cursor.execute("SELECT summary FROM summaries ORDER BY id DESC LIMIT 1")
     summary = cursor.fetchone()
     cursor.close()
-    return summary[0]
+    return summary
 
 def get_all_summaries(conn):
     """Get all the AI generated summaries from the database.
