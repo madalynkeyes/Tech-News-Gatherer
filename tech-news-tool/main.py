@@ -190,8 +190,10 @@ def fetch_and_store_articles(conn=Depends(get_db_connection)):
     stats = save_filtered_articles(conn)
     now_utc = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     fetch_state["last_fetch_time"] = now_utc
-    fetch_state["trends_summary"]  = stats[3]
+    # fetch_state["trends_summary"]  = stats[3]
     fetch_state["new_articles"]    = stats[2]
+    if (fetch_state["new_articles"]>0):
+        fetch_state["trends_summary"]  = stats[3]
     return {"message": "Articles fetched and stored successfully.", "stats": stats}
 
 @app.post("/cleanup")

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Today — Tech News Tool</title>
   <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
   <link rel="manifest" href="/static/images/site.webmanifest">
@@ -61,6 +62,7 @@
       display: flex;
       align-items: center;
       padding: 0 var(--gutter);
+      /* overflow: hidden; */
     }
 
     .nav__inner {
@@ -70,6 +72,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+
+    .nav__inner .icon {
+      display:none;
     }
 
     .nav__logo {
@@ -127,6 +133,43 @@
       white-space: nowrap;
     }
     .nav__cta:hover { background: var(--accent); }
+
+    /* ── Sidebar ─────────────────────────────────────────────────── */
+    .sidenav{
+      height:100%;
+      width:0;
+      position:fixed;
+      z-index:200;
+      top:0;
+      right:0;
+      background-color: var(--accent);
+      overflow-x:hidden; 
+      padding-top:50px;
+      transition:0.5s;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidenav a{
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 17px;
+      color: var(--paper);
+      display: block;
+      transition: 0.3s;
+      font-family: var(--ff-sans);
+    }
+
+    .sidenav a:hover{
+      color: var(--ink);
+    }
+
+    .sidenav .closebtn {
+      position: absolute;
+      top: 0px;
+      right: 25px;
+      font-size: 32px;
+      margin-left: 50px;
+    }
 
     /* ── Hero ───────────────────────────────────────────────────── */
     .hero {
@@ -671,6 +714,23 @@
       .strip-grid { grid-template-columns: repeat(2, 1fr); }
       .stats-row { grid-template-columns: 1fr 1fr; }
       .nav__links { display: none; }
+      .nav__cta {display: none;}
+      .nav__inner a.icon {float: right; display:block;}
+      .hero__meta{
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+      }
+      .hero__meta-group{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #hero-separator{
+        display:none;
+      }
     }
 
     @media (max-width: 480px) {
@@ -690,16 +750,32 @@
   <!-- ── Nav ──────────────────────────────────────────────────── -->
   <nav class="nav">
     <div class="nav__inner">
+      
       <a href="#" class="nav__logo">AI<span>Today</span></a>
-      <ul class="nav__links">
+      <ul class="nav__links" id="myNavLinks">
         <li><a href="#home" class="active" onclick="setActiveNav(this)">Home</a></li>
         <li><a href="#stats" onclick="setActiveNav(this)">Stats</a></li>
         <li><a href="#all-articles" onclick="setActiveNav(this)">All Articles</a></li>
         <li><a href="/static/summaries.html" onclick="setActiveNav(this)">Summaries</a></li>
       </ul>
       <button class="nav__cta" onclick="triggerFetch()">Refresh Feed</button>
+      <a href="javascript:void(0);" class="icon" onclick="openNavMenu()">
+        <i class="fa fa-bars"></i>
+      </a>
     </div>
   </nav>
+
+  <!-- ── Sidebar ──────────────────────────────────────────────── -->
+   <div id="mySideNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNavMenu()">&times;</a>
+    <a href="#home" class="active" onclick="setActiveNav(this)">Home</a>
+    <a href="#stats" onclick="setActiveNav(this)">Stats</a>
+    <a href="#all-articles" onclick="setActiveNav(this)">All Articles</a>
+    <a href="/static/summaries.html" onclick="setActiveNav(this)">Summaries</a>
+   </div>
+
+  <!-- ── Overlay ──────────────────────────────────────────────── -->
+   
 
   <!-- ── Hero ─────────────────────────────────────────────────── -->
   <section class="hero" id="home">
@@ -707,10 +783,12 @@
     <h1 class="hero__headline">Stay sharp.<br><em>Learn AI.</em></h1>
     <p class="hero__sub">Curated AI and tech news, fetched automatically every two hours from the sources that matter.</p>
     <div class="hero__meta">
-      <span class="hero__meta-dot"></span>
-      <span id="hero-last-fetch">Loading feed...</span>
-      <span>·</span>
-      <span id="hero-total">— articles</span>
+      <div class="hero__meta-group">
+        <span class="hero__meta-dot"></span>
+        <span id="hero-last-fetch">Loading feed...</span>
+      </div>
+      <span id="hero-separator">·</span>
+      <span id="hero-total">— Articles</span>
     </div>
   </section>
 
@@ -797,6 +875,14 @@
     function setActiveNav(el) {
       document.querySelectorAll('.nav__links a').forEach(a => a.classList.remove('active'));
       el.classList.add('active');
+    }
+    function openNavMenu(){
+      const sideNav = document.getElementById("mySideNav");
+      sideNav.style.width = "200px";
+      
+    }
+    function closeNavMenu(){
+      document.getElementById("mySideNav").style.width = "0";
     }
 
     // ── Image helper ───────────────────────────────────────────
@@ -953,7 +1039,7 @@
     function renderStats(data) {
       document.getElementById('stat-total').textContent = data.total ?? '—';
       document.getElementById('stat-new').textContent   = data.new_articles ?? '—';
-      document.getElementById('hero-total').textContent = `${data.total ?? '—'} articles`;
+      document.getElementById('hero-total').textContent = `${data.total ?? '—'} Articles`;
       document.getElementById('article-count-label').textContent = `${allArticles.length} total`;
 
       if (data.last_fetch) {

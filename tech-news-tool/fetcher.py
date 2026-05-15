@@ -272,8 +272,11 @@ def save_filtered_articles(conn):
     """
     new_articles = 0
     mycursor = conn.cursor()
+    print("Fetching Articles from Feeds...")
     all_articles = fetch_articles(FEEDS,conn)
+    print("Now Filtering Fetched Articles...")
     filtered = filter_by_keywords(all_articles, KEYWORDS)
+    print("Inserting new articles into database...")
     for article in filtered:
         new_articles += insert_article(conn, article)
     if(new_articles > 0):
