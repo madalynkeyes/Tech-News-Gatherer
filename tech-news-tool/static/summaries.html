@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Summaries — AI Today</title>
   <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
   <link rel="manifest" href="/static/images/site.webmanifest">
@@ -46,7 +47,8 @@
     /* ── Nav ─────────────────────────────────────────────────── */
     .nav {
       position: sticky;
-      top: 0; z-index: 100;
+      top: 0; 
+      z-index: 100;
       height: var(--nav-h);
       background: rgba(250,250,248,0.92);
       backdrop-filter: blur(12px);
@@ -57,6 +59,10 @@
     .nav__inner {
       width: 100%; max-width: 1200px; margin: 0 auto;
       display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav__inner .icon {
+      display:none;
     }
     .nav__logo { font-family: var(--ff-serif); font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em; }
     .nav__logo span { color: var(--accent); }
@@ -76,6 +82,55 @@
     .nav__links a:hover::after,
     .nav__links a.active::after { width: 100%; }
     .nav__links a.active { color: var(--ink); }
+
+    /* ── Sidebar & Overlay ─────────────────────────────────────────────── */
+    .sidenav{
+      height:100%;
+      width:0;
+      position:fixed;
+      z-index:200;
+      top:0;
+      right:0;
+      background-color: var(--accent);
+      overflow-x:hidden; 
+      padding-top:50px;
+      transition:0.5s;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidenav a{
+      padding: 8px 8px 8px 32px;
+      text-decoration: none;
+      font-size: 17px;
+      color: var(--paper);
+      display: block;
+      transition: 0.3s;
+      font-family: var(--ff-sans);
+    }
+
+    .sidenav a:hover{
+      color: var(--ink);
+    }
+
+    .sidenav .closebtn {
+      position: absolute;
+      top: 0px;
+      right: 25px;
+      font-size: 32px;
+      margin-left: 50px;
+    }
+
+    #myOverlay {
+      display: none; /* Ensure it's not display: none */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+      z-index: 100; /* Higher than content, lower than sidebar (200) */
+      cursor: pointer;
+    }
 
     /* ── Page header ─────────────────────────────────────────── */
     .page-header {
@@ -246,7 +301,10 @@
     .footer__logo span { color: var(--accent); }
     .footer__note { font-family: var(--ff-mono); font-size: 0.62rem; letter-spacing: 0.06em; }
 
-    @media (max-width: 768px) { .nav__links { display: none; } }
+    @media (max-width: 768px) { 
+      .nav__links { display: none; } 
+      .nav__inner a.icon {float: right; display:block;}
+    }
   </style>
 </head>
 <body>
@@ -261,8 +319,24 @@
         <li><a href="/static/index.html#all-articles">All Articles</a></li>
         <li><a href="/static/summaries.html" class="active">Summaries</a></li>
       </ul>
+      <a href="javascript:void(0);" class="icon" onclick="openNavMenu()">
+        <i class="fa fa-bars"></i>
+      </a>
     </div>
   </nav>
+
+  <!-- ── Sidebar ──────────────────────────────────────────────── -->
+   <div id="mySideNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNavMenu()">&times;</a>
+    <a href="/static/index.html#home" class="active" onclick="setActiveNav(this); closeNavMenu()">Home</a>
+    <!-- <a href="#stats" onclick="setActiveNav(this); closeNavMenu()">Stats</a>
+    <a href="#all-articles" onclick="setActiveNav(this); closeNavMenu()">All Articles</a>
+    <a href="/static/summaries.html" onclick="setActiveNav(this); closeNavMenu()">Summaries</a> -->
+   </div>
+
+  <!-- ── Overlay ──────────────────────────────────────────────── -->
+  <div class="overlay" onclick="closeNavMenu()" id="myOverlay"></div>
+
 
   <!-- Page header -->
   <div class="page-header">
@@ -307,6 +381,12 @@
     let summaries   = [];
 
     const chevronSVG = `<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const overlay = document.getElementById('myOverlay');
+    const sidebar = document.getElementById('mySideNav');
+
+    overlay.addEventListener('click', () => {
+      closeNavMenu();
+    });
 
     // ── Toggle open / closed ───────────────────────────────────
     function toggleCard(card) {
@@ -372,6 +452,22 @@
 
       currentPage = page;
       buildPagination();
+    }
+
+     // ── Nav & SideBar ───────────────────────────────────────────
+    function setActiveNav(el) {
+      document.querySelectorAll('.nav__links a').forEach(a => a.classList.remove('active'));
+      el.classList.add('active');
+    }
+    function openNavMenu(){
+      const sideNav = document.getElementById("mySideNav");
+      sideNav.style.width = "200px";
+      sideNav.style.display = "block";
+      document.getElementById("myOverlay").style.display = "block";
+    }
+    function closeNavMenu(){
+      document.getElementById("mySideNav").style.width = "0";
+      document.getElementById("myOverlay").style.display = "none";
     }
 
     // ── Build the pagination bar ───────────────────────────────

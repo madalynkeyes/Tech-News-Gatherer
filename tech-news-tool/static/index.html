@@ -134,7 +134,7 @@
     }
     .nav__cta:hover { background: var(--accent); }
 
-    /* ── Sidebar ─────────────────────────────────────────────────── */
+    /* ── Sidebar & Overlay ─────────────────────────────────────────────── */
     .sidenav{
       height:100%;
       width:0;
@@ -169,6 +169,18 @@
       right: 25px;
       font-size: 32px;
       margin-left: 50px;
+    }
+
+    #myOverlay {
+      display: none; /* Ensure it's not display: none */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+      z-index: 100; /* Higher than content, lower than sidebar (200) */
+      cursor: pointer;
     }
 
     /* ── Hero ───────────────────────────────────────────────────── */
@@ -768,14 +780,14 @@
   <!-- ── Sidebar ──────────────────────────────────────────────── -->
    <div id="mySideNav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNavMenu()">&times;</a>
-    <a href="#home" class="active" onclick="setActiveNav(this)">Home</a>
-    <a href="#stats" onclick="setActiveNav(this)">Stats</a>
-    <a href="#all-articles" onclick="setActiveNav(this)">All Articles</a>
-    <a href="/static/summaries.html" onclick="setActiveNav(this)">Summaries</a>
+    <a href="#home" class="active" onclick="setActiveNav(this); closeNavMenu()">Home</a>
+    <a href="#stats" onclick="setActiveNav(this); closeNavMenu()">Stats</a>
+    <a href="#all-articles" onclick="setActiveNav(this); closeNavMenu()">All Articles</a>
+    <a href="/static/summaries.html" onclick="setActiveNav(this); closeNavMenu()">Summaries</a>
    </div>
 
   <!-- ── Overlay ──────────────────────────────────────────────── -->
-   
+  <div class="overlay" onclick="closeNavMenu()" id="myOverlay"></div>
 
   <!-- ── Hero ─────────────────────────────────────────────────── -->
   <section class="hero" id="home">
@@ -870,8 +882,14 @@
     let currentPage = 0;
     let allArticles = [];
     const loader = document.getElementById('loader');
+    const overlay = document.getElementById('myOverlay');
+    const sidebar = document.getElementById('mySideNav');
 
-    // ── Nav ────────────────────────────────────────────────────
+    overlay.addEventListener('click', () => {
+      closeNavMenu();
+    });
+
+    // ── Nav & SideBar ───────────────────────────────────────────
     function setActiveNav(el) {
       document.querySelectorAll('.nav__links a').forEach(a => a.classList.remove('active'));
       el.classList.add('active');
@@ -879,10 +897,12 @@
     function openNavMenu(){
       const sideNav = document.getElementById("mySideNav");
       sideNav.style.width = "200px";
-      
+      sideNav.style.display = "block";
+      document.getElementById("myOverlay").style.display = "block";
     }
     function closeNavMenu(){
       document.getElementById("mySideNav").style.width = "0";
+      document.getElementById("myOverlay").style.display = "none";
     }
 
     // ── Image helper ───────────────────────────────────────────
