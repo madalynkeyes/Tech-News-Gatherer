@@ -194,7 +194,38 @@
       padding: clamp(60px, 10vw, 120px) var(--gutter) clamp(40px, 6vw, 80px);
       position: relative;
       overflow: hidden;
+      background: #0d0d0d;     
     }
+
+    /* Animated mesh gradient canvas */
+    #hero-canvas {                  
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Subtle noise grain overlay */
+    .hero::after {               
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+      opacity: 0.45;
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: overlay;
+    }
+
+    /* All direct hero children above canvas */
+    .hero > *:not(#hero-canvas) {   
+      position: relative;
+      z-index: 2;
+    }
+
 
     .hero::before {
       content: '';
@@ -214,7 +245,7 @@
       font-size: 0.8rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--ink-soft);
+      color: var(--ink);
       margin-bottom: 1.5rem;
     }
 
@@ -223,7 +254,7 @@
       display: block;
       width: 32px;
       height: 1px;
-      background: var(--rule);
+      background: var(--ink);
     }
 
     .hero__headline {
@@ -232,7 +263,7 @@
       font-weight: 900;
       line-height: 0.95;
       letter-spacing: -0.03em;
-      color: var(--ink);
+      color: rgba(250,250,248,0.95);
       max-width: 900px;
       margin-bottom: 1.5rem;
     }
@@ -240,6 +271,7 @@
     .hero__headline em {
       font-style: italic;
       color: var(--accent);
+      text-shadow: 0 0 40px rgba(200,75,49,0.5);
     }
 
     .hero__sub {
@@ -260,17 +292,47 @@
       color: var(--ink-soft);
     }
 
+    .hero__meta-group{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap:8px;
+    }
+
     .hero__meta-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
       background: var(--accent);
       animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(200,75,49,0.8);
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.7); }
     }
+
+    @keyframes heroRise {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    section#home > * {
+      animation: heroRise 0.8s ease-out forwards;
+      opacity: 0; /* Start hidden until animation begins */
+    }
+
+    /* Staggered delays */
+    section#home > *:nth-child(1) { animation-delay: 0.1s; }
+    section#home > *:nth-child(2) { animation-delay: 0.2s; }
+    section#home > *:nth-child(3) { animation-delay: 0.3s; }
+    section#home > *:nth-child(4) { animation-delay: 0.4s; }
 
     /* ── Section Label ──────────────────────────────────────────── */
     .section-label {
@@ -791,6 +853,9 @@
 
   <!-- ── Hero ─────────────────────────────────────────────────── -->
   <section class="hero" id="home">
+
+    <iframe src="https://colorflow-embed.b-cdn.net/embed.html#e=EV4fn1TD" width="1600" height="1200" frameborder="0" id="hero-canvas"></iframe>
+    <!-- <canvas id="hero-canvas" aria-hidden="true"></canvas> -->
     <p class="hero__eyebrow">AI &amp; Tech Intelligence</p>
     <h1 class="hero__headline">Stay sharp.<br><em>Learn AI.</em></h1>
     <p class="hero__sub">Curated AI and tech news, fetched automatically every two hours from the sources that matter.</p>
@@ -889,6 +954,127 @@
       closeNavMenu();
     });
 
+    // ── Mesh Gradient Hero Background ─────────────────────────
+    // (function() {
+    //   const canvas = document.getElementById('hero-canvas');
+    //   const hero   = canvas.parentElement;
+    //   const gl     = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    //   if (!gl) return; // graceful fallback – hero stays dark
+
+    //   function resize() {
+    //     canvas.width  = hero.offsetWidth;
+    //     canvas.height = hero.offsetHeight;
+    //     gl.viewport(0, 0, canvas.width, canvas.height);
+    //   }
+    //   resize();
+    //   new ResizeObserver(resize).observe(hero);
+
+    //   const vert = `
+    //     attribute vec2 a_pos;
+    //     void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+    //   `;
+
+    //   const frag = `
+    //     precision mediump float;
+    //     uniform vec2  u_res;
+    //     uniform float u_t;
+
+    //     vec3 c0 = vec3(0.051, 0.051, 0.051);
+    //     vec3 c1 = vec3(0.784, 0.294, 0.192);
+    //     vec3 c2 = vec3(0.102, 0.227, 0.165);
+    //     vec3 c3 = vec3(0.176, 0.114, 0.082);
+    //     vec3 c4 = vec3(0.533, 0.200, 0.133);
+
+    //     float hash(vec2 p) {
+    //       return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+    //     }
+
+    //     float noise(vec2 p) {
+    //       vec2 i = floor(p);
+    //       vec2 f = fract(p);
+    //       f = f * f * (3.0 - 2.0 * f);
+    //       return mix(
+    //         mix(hash(i), hash(i + vec2(1,0)), f.x),
+    //         mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), f.x),
+    //         f.y
+    //       );
+    //     }
+
+    //     float fbm(vec2 p) {
+    //       float v = 0.0, a = 0.5;
+    //       for (int i = 0; i < 5; i++) {
+    //         v += a * noise(p);
+    //         p  = p * 2.1 + vec2(1.7, 9.2);
+    //         a *= 0.5;
+    //       }
+    //       return v;
+    //     }
+
+    //     void main() {
+    //       vec2 uv = gl_FragCoord.xy / u_res;
+    //       uv.y = 1.0 - uv.y;
+
+    //       float spd  = u_t * 0.09;
+    //       vec2  warp = vec2(
+    //         fbm(uv + vec2(spd * 0.7,  spd * 0.4)),
+    //         fbm(uv + vec2(spd * 0.3, -spd * 0.6))
+    //       );
+    //       vec2  warp2 = vec2(
+    //         fbm(uv + 4.0 * warp + vec2(1.7 + spd * 0.2, 9.2)),
+    //         fbm(uv + 4.0 * warp + vec2(8.3, 2.8 + spd * 0.15))
+    //       );
+
+    //       float f = fbm(uv + 4.0 * warp2);
+
+    //       vec3 col;
+    //       if (f < 0.2)        col = mix(c0, c3,  f / 0.2);
+    //       else if (f < 0.42)  col = mix(c3, c2,  (f - 0.2) / 0.22);
+    //       else if (f < 0.62)  col = mix(c2, c4,  (f - 0.42) / 0.20);
+    //       else if (f < 0.80)  col = mix(c4, c1,  (f - 0.62) / 0.18);
+    //       else                col = mix(c1, c0,  (f - 0.80) / 0.20);
+
+    //       float vig = 1.0 - 0.7 * pow(length(uv - 0.5) * 1.6, 2.0);
+    //       col *= vig;
+
+    //       gl_FragColor = vec4(col, 1.0);
+    //     }
+    //   `;
+
+    //   function compile(type, src) {
+    //     const s = gl.createShader(type);
+    //     gl.shaderSource(s, src);
+    //     gl.compileShader(s);
+    //     return s;
+    //   }
+
+    //   const prog = gl.createProgram();
+    //   gl.attachShader(prog, compile(gl.VERTEX_SHADER,   vert));
+    //   gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
+    //   gl.linkProgram(prog);
+    //   gl.useProgram(prog);
+
+    //   const buf = gl.createBuffer();
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    //   gl.bufferData(gl.ARRAY_BUFFER,
+    //     new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    //   const loc = gl.getAttribLocation(prog, 'a_pos');
+    //   gl.enableVertexAttribArray(loc);
+    //   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    //   const uRes = gl.getUniformLocation(prog, 'u_res');
+    //   const uT   = gl.getUniformLocation(prog, 'u_t');
+
+    //   let start = null;
+    //   function frame(ts) {
+    //     if (!start) start = ts;
+    //     const t = (ts - start) / 1000;
+    //     gl.uniform2f(uRes, canvas.width, canvas.height);
+    //     gl.uniform1f(uT, t);
+    //     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    //     requestAnimationFrame(frame);
+    //   }
+    //   requestAnimationFrame(frame);
+    // })();
     // ── Nav & SideBar ───────────────────────────────────────────
     function setActiveNav(el) {
       document.querySelectorAll('.nav__links a').forEach(a => a.classList.remove('active'));
@@ -1116,3 +1302,4 @@
   </script>
 </body>
 </html>
+
