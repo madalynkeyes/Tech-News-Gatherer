@@ -76,9 +76,9 @@ def fetch_articles(feeds, conn):
                 continue
 
             # skip if we've seen this URL before (if two sources point to same url)
-            if link in seen_urls:
+            elif link in seen_urls:
                 continue
-            if entry.get("media_thumbnail"):
+            elif entry.get("media_thumbnail"):
                 image = entry.get("media_thumbnail", [{}])[0].get("url", "")
             elif 'enclosures' in entry and entry.enclosures:
                 image = entry.enclosures[0].get("href", "")
@@ -136,19 +136,19 @@ def scrape_og_image(url):
         return None
 
 def convert_published_date(published_parsed):
-    """Convert a parsed RSS date to ISO 8601 format with UTC timezone.
+    """Convert a parsed RSS date to MySQL datetime format.
 
     Args:
         published_parsed: A time.struct_time object from feedparser.
 
     Returns:
-        A string formatted as 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601 UTC), or None if no date.
+        A string formatted as 'YYYY-MM-DD HH:MM:SS', or None if no date.
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
     if published_parsed:
-        dt = datetime.fromtimestamp(time.mktime(published_parsed), tz=timezone.utc)
-        iso_dt = dt.strftime('%Y-%m-%dT%H:%M:%SZ')
-        return iso_dt
+        dt = datetime.fromtimestamp(time.mktime(published_parsed))
+        mysql_dt = dt.strftime('%Y-%m-%d %H:%M:%S')
+        return mysql_dt
     return None
 
 def filter_by_keywords(articles, keywords):
@@ -199,7 +199,7 @@ def summarize_trends(articles):
     words = re.findall(r'\b\w+\b', all_text.lower())
     
     # Remove common stop words (simple list)
-    stop_words = set(['off','says', 'raises','now', 'up','just','from','next','the', 'a','as', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
+    stop_words = set(['off','your','new', 'than','says', 'raises','now', 'up','just','from','next','the', 'a','as', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it','its','into','how', 'we','why', 'they', 'me', 'him', 'her', 'us', 'them'])
     filtered_words = [word for word in words if word not in stop_words and len(word) > 1]
     
     word_counts = Counter(filtered_words)
@@ -273,19 +273,21 @@ def save_filtered_articles(conn):
     new_articles = 0
     mycursor = conn.cursor()
     print("Fetching Articles from Feeds...")
-    all_articles = fetch_articles(FEEDS,conn)
+    all_fetched_articles = fetch_articles(FEEDS,conn)
     print("Now Filtering Fetched Articles...")
-    filtered = filter_by_keywords(all_articles, KEYWORDS)
+    filtered = filter_by_keywords(all_fetched_articles, KEYWORDS)
     print("Inserting new articles into database...")
     for article in filtered:
         new_articles += insert_article(conn, article)
     if(new_articles > 0):
-        print(f"Inserted {new_articles} new articles into the database.\n")  
+        print(f"Inserted {new_articles} new articles into the database.\n")
+        trends_summary = print_fetcher_summary(all_fetched_articles, filtered)  
     else:
         print("No new articles to insert.\n\n")
-    trends_summary = print_fetcher_summary(all_articles, filtered)
+        all_articles = get_all_articles(conn)
+        trends_summary = print_fetcher_summary(all_articles, filtered)
     get_all_articles(conn)
     mycursor.close()
-    return  len(all_articles),len(filtered),new_articles, trends_summary
+    return  len(all_fetched_articles),len(filtered),new_articles, trends_summary
     
 

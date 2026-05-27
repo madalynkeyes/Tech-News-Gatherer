@@ -194,7 +194,7 @@
       padding: clamp(60px, 10vw, 120px) var(--gutter) clamp(40px, 6vw, 80px);
       position: relative;
       overflow: hidden;
-      background: #0d0d0d;     
+      /* background: #0d0d0d;      */
     }
 
     /* Animated mesh gradient canvas */
@@ -205,6 +205,7 @@
       height: 100%;
       pointer-events: none;
       z-index: 0;
+      mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
     }
 
     /* Subtle noise grain overlay */
@@ -855,7 +856,7 @@
   <section class="hero" id="home">
 
     <iframe src="https://colorflow-embed.b-cdn.net/embed.html#e=EV4fn1TD" width="1600" height="1200" frameborder="0" id="hero-canvas"></iframe>
-    <!-- <canvas id="hero-canvas" aria-hidden="true"></canvas> -->
+    <!-- Gradient Mesh Created with https://colorflow.ls.graphics/ -->
     <p class="hero__eyebrow">AI &amp; Tech Intelligence</p>
     <h1 class="hero__headline">Stay sharp.<br><em>Learn AI.</em></h1>
     <p class="hero__sub">Curated AI and tech news, fetched automatically every two hours from the sources that matter.</p>
@@ -954,127 +955,6 @@
       closeNavMenu();
     });
 
-    // ── Mesh Gradient Hero Background ─────────────────────────
-    // (function() {
-    //   const canvas = document.getElementById('hero-canvas');
-    //   const hero   = canvas.parentElement;
-    //   const gl     = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    //   if (!gl) return; // graceful fallback – hero stays dark
-
-    //   function resize() {
-    //     canvas.width  = hero.offsetWidth;
-    //     canvas.height = hero.offsetHeight;
-    //     gl.viewport(0, 0, canvas.width, canvas.height);
-    //   }
-    //   resize();
-    //   new ResizeObserver(resize).observe(hero);
-
-    //   const vert = `
-    //     attribute vec2 a_pos;
-    //     void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
-    //   `;
-
-    //   const frag = `
-    //     precision mediump float;
-    //     uniform vec2  u_res;
-    //     uniform float u_t;
-
-    //     vec3 c0 = vec3(0.051, 0.051, 0.051);
-    //     vec3 c1 = vec3(0.784, 0.294, 0.192);
-    //     vec3 c2 = vec3(0.102, 0.227, 0.165);
-    //     vec3 c3 = vec3(0.176, 0.114, 0.082);
-    //     vec3 c4 = vec3(0.533, 0.200, 0.133);
-
-    //     float hash(vec2 p) {
-    //       return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-    //     }
-
-    //     float noise(vec2 p) {
-    //       vec2 i = floor(p);
-    //       vec2 f = fract(p);
-    //       f = f * f * (3.0 - 2.0 * f);
-    //       return mix(
-    //         mix(hash(i), hash(i + vec2(1,0)), f.x),
-    //         mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), f.x),
-    //         f.y
-    //       );
-    //     }
-
-    //     float fbm(vec2 p) {
-    //       float v = 0.0, a = 0.5;
-    //       for (int i = 0; i < 5; i++) {
-    //         v += a * noise(p);
-    //         p  = p * 2.1 + vec2(1.7, 9.2);
-    //         a *= 0.5;
-    //       }
-    //       return v;
-    //     }
-
-    //     void main() {
-    //       vec2 uv = gl_FragCoord.xy / u_res;
-    //       uv.y = 1.0 - uv.y;
-
-    //       float spd  = u_t * 0.09;
-    //       vec2  warp = vec2(
-    //         fbm(uv + vec2(spd * 0.7,  spd * 0.4)),
-    //         fbm(uv + vec2(spd * 0.3, -spd * 0.6))
-    //       );
-    //       vec2  warp2 = vec2(
-    //         fbm(uv + 4.0 * warp + vec2(1.7 + spd * 0.2, 9.2)),
-    //         fbm(uv + 4.0 * warp + vec2(8.3, 2.8 + spd * 0.15))
-    //       );
-
-    //       float f = fbm(uv + 4.0 * warp2);
-
-    //       vec3 col;
-    //       if (f < 0.2)        col = mix(c0, c3,  f / 0.2);
-    //       else if (f < 0.42)  col = mix(c3, c2,  (f - 0.2) / 0.22);
-    //       else if (f < 0.62)  col = mix(c2, c4,  (f - 0.42) / 0.20);
-    //       else if (f < 0.80)  col = mix(c4, c1,  (f - 0.62) / 0.18);
-    //       else                col = mix(c1, c0,  (f - 0.80) / 0.20);
-
-    //       float vig = 1.0 - 0.7 * pow(length(uv - 0.5) * 1.6, 2.0);
-    //       col *= vig;
-
-    //       gl_FragColor = vec4(col, 1.0);
-    //     }
-    //   `;
-
-    //   function compile(type, src) {
-    //     const s = gl.createShader(type);
-    //     gl.shaderSource(s, src);
-    //     gl.compileShader(s);
-    //     return s;
-    //   }
-
-    //   const prog = gl.createProgram();
-    //   gl.attachShader(prog, compile(gl.VERTEX_SHADER,   vert));
-    //   gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
-    //   gl.linkProgram(prog);
-    //   gl.useProgram(prog);
-
-    //   const buf = gl.createBuffer();
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    //   gl.bufferData(gl.ARRAY_BUFFER,
-    //     new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-    //   const loc = gl.getAttribLocation(prog, 'a_pos');
-    //   gl.enableVertexAttribArray(loc);
-    //   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-    //   const uRes = gl.getUniformLocation(prog, 'u_res');
-    //   const uT   = gl.getUniformLocation(prog, 'u_t');
-
-    //   let start = null;
-    //   function frame(ts) {
-    //     if (!start) start = ts;
-    //     const t = (ts - start) / 1000;
-    //     gl.uniform2f(uRes, canvas.width, canvas.height);
-    //     gl.uniform1f(uT, t);
-    //     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    //     requestAnimationFrame(frame);
-    //   }
-    //   requestAnimationFrame(frame);
-    // })();
     // ── Nav & SideBar ───────────────────────────────────────────
     function setActiveNav(el) {
       document.querySelectorAll('.nav__links a').forEach(a => a.classList.remove('active'));
@@ -1291,9 +1171,14 @@
 
     // ── Cleanup ───────────────────────────────────────────────
     async function runCleanup() {
-      const res  = await fetch('/cleanup', { method: 'POST' });
-      const data = await res.json();
-      document.getElementById('cleanup-result').textContent = data.message;
+      loader.classList.remove('hidden');
+      try {
+        const res  = await fetch('/cleanup', { method: 'POST' });
+        const data = await res.json();
+        document.getElementById('cleanup-result').textContent = data.message;
+      } finally {
+        loader.classList.add('hidden');
+      }
     }
 
     // ── Init ──────────────────────────────────────────────────

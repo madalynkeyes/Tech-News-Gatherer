@@ -23,7 +23,7 @@ def get_connection():
             password=os.getenv("DB_PASSWORD"),
             port=os.getenv("DB_PORT", 3306)
         )
-        temp_conn.cursor().execute("SET time_zone = '+00:00'")
+        # temp_conn.cursor().execute("SET time_zone = '+00:00'")
         temp_conn.cursor().execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv('DB_NAME')}")
         temp_conn.close()
         
@@ -58,7 +58,7 @@ def create_articles_table(conn):
     title TEXT NOT NULL, 
     link_hash VARCHAR(64) UNIQUE NOT NULL,
     link TEXT NOT NULL,
-    published TEXT, 
+    published TIMESTAMP, 
     summary TEXT, 
     source VARCHAR(255),
     image_url TEXT
@@ -174,7 +174,7 @@ def delete_old_articles(conn):
         A count of how many articles were deleted from articles table.
     """
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("DELETE FROM articles WHERE published < NOW() - INTERVAL 7 DAY")
+    cursor.execute("DELETE FROM articles WHERE published < UTC_TIMESTAMP() - INTERVAL 7 DAY")
     deleted_count = cursor.rowcount
     conn.commit()
     cursor.close()
