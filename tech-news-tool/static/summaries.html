@@ -29,7 +29,7 @@
       --ff-sans:  'DM Sans', system-ui, sans-serif;
       --ff-mono:  'DM Mono', monospace;
       --nav-h:    64px;
-      --max-w:    800px;
+      --max-w:    1200px;
       --gutter:   clamp(16px, 4vw, 48px);
     }
 
@@ -47,41 +47,119 @@
     /* ── Nav ─────────────────────────────────────────────────── */
     .nav {
       position: sticky;
-      top: 0; 
+      top: 0;
       z-index: 100;
       height: var(--nav-h);
-      background: rgba(250,250,248,0.92);
+      background: rgba(250, 250, 248, 0.92);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--rule);
-      display: flex; align-items: center;
+      display: flex;
+      align-items: center;
       padding: 0 var(--gutter);
+      /* overflow: hidden; */
     }
+
     .nav__inner {
-      width: 100%; max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
+      width: 100%;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .nav__inner .icon {
       display:none;
     }
-    .nav__logo { font-family: var(--ff-serif); font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em; }
+
+    .nav__logo {
+      font-family: var(--ff-serif);
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
     .nav__logo span { color: var(--accent); }
-    .nav__links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+
+    .nav__links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
     .nav__links a {
-      font-size: 0.8rem; font-weight: 500;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--ink-mid); transition: color 0.2s;
-      position: relative; padding-bottom: 2px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      transition: color 0.2s;
+      position: relative;
+      padding-bottom: 2px;
     }
+
     .nav__links a::after {
-      content: ''; position: absolute;
-      bottom: 0; left: 0; width: 0; height: 1px;
-      background: var(--accent); transition: width 0.25s ease;
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.25s ease;
     }
+
     .nav__links a:hover { color: var(--ink); }
-    .nav__links a:hover::after,
-    .nav__links a.active::after { width: 100%; }
+    .nav__links a:hover::after, .nav__links a.active::after { width: 100%; }
     .nav__links a.active { color: var(--ink); }
+    .home-dropdown{
+      position: absolute;
+      top:100%;
+      left:0;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      list-style: none;
+      padding: 10px;
+      z-index: 1000;
+      display: none;
+    }
+
+    li{
+      position: relative;
+    }
+
+    ul.home-dropdown{
+      position: absolute;
+      top: 100%;
+      left: 0px;
+      background-color: rgb(255, 255, 255);
+      border: 1px solid rgb(204, 204, 204);
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
+      list-style: none;
+      padding: 10px;
+      margin: 0px;
+      z-index: 1000;
+      min-width: 120px;
+      display: none;
+    }
+
+
+    .nav__cta {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 9px 20px;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 2px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .nav__cta:hover { background: var(--accent); }
 
     /* ── Sidebar & Overlay ─────────────────────────────────────────────── */
     .sidenav{
@@ -96,9 +174,10 @@
       padding-top:50px;
       transition:0.5s;
       box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+
     }
 
-    .sidenav a{
+    .sidenav a, .sidenav-dropdown {
       padding: 8px 8px 8px 32px;
       text-decoration: none;
       font-size: 17px;
@@ -106,9 +185,11 @@
       display: block;
       transition: 0.3s;
       font-family: var(--ff-sans);
+      background-color: var(--accent);
+      border: none;
     }
 
-    .sidenav a:hover{
+    .sidenav a:hover, .sidenav-dropdown:hover{
       color: var(--ink);
     }
 
@@ -118,6 +199,11 @@
       right: 25px;
       font-size: 32px;
       margin-left: 50px;
+    }
+    .sidenav-drop-content{
+      display:none;
+      background-color: var(--accent);
+      padding-left:12px;
     }
 
     #myOverlay {
@@ -291,34 +377,106 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Footer ─────────────────────────────────────────────── */
-    .footer { background: var(--ink); color: rgba(255,255,255,0.4); padding: 32px var(--gutter); }
-    .footer__inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    .footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.4);
+      padding: 48px var(--gutter);
     }
-    .footer__logo { font-family: var(--ff-serif); font-size: 1rem; font-weight: 900; color: rgba(255,255,255,0.7); }
-    .footer__logo span { color: var(--accent); }
-    .footer__note { font-family: var(--ff-mono); font-size: 0.62rem; letter-spacing: 0.06em; }
 
+    .footer__inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer__logo {
+      font-family: var(--ff-serif);
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .footer__logo span { color: var(--accent); }
+
+    .footer__note {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Loader ─────────────────────────────────────────────────── */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(250,250,248,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s;
+    }
+
+    .loader-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 8px solid var(--rule);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Placeholder shimmer ────────────────────────────────────── */
+    .shimmer {
+      background: linear-gradient(90deg, var(--paper-2) 25%, var(--rule) 50%, var(--paper-2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 768px) { 
       .nav__links { display: none; } 
       .nav__inner a.icon {float: right; display:block;}
+      .nav__cta{display: none;}
     }
   </style>
 </head>
 <body>
 
+   <!-- Loader -->
+  <div class="loader-overlay" id="loader">
+    <div class="loader-spinner"></div>
+  </div>
+
   <!-- Nav -->
-  <nav class="nav">
+   <nav class="nav">
     <div class="nav__inner">
-      <a href="/static/index.html" class="nav__logo">AI<span>Today</span></a>
-      <ul class="nav__links">
-        <li><a href="/static/index.html#home">Home</a></li>
-        <li><a href="/static/index.html#stats">Stats</a></li>
-        <li><a href="/static/index.html#all-articles">All Articles</a></li>
-        <li><a href="/static/summaries.html" class="active">Summaries</a></li>
+      <a href="/static/index.html#" class="nav__logo">AI<span>Today</span></a>
+      <ul class="nav__links" id="myNavLinks">
+        <li>
+          <a href="/static/index.html#home" onclick="setActiveNav(this)">Home</a>
+          <ul class="home-dropdown" style="display: none;">
+            <li><a href="/static/index.html#stats">Stats</a></li>
+            <li><a href="/static/index.html#all-articles">All Articles</a></li>
+          </ul>
+        </li>
+        <li><a href="/static/summaries.html" class="active" onclick="setActiveNav(this)">Summaries</a></li>
+        <li><a href="/static/about.html" onclick="setActiveNav(this)">About</a></li>
       </ul>
+      <button class="nav__cta" onclick="triggerFetch()">Refresh Feed</button>
       <a href="javascript:void(0);" class="icon" onclick="openNavMenu()">
         <i class="fa fa-bars"></i>
       </a>
@@ -328,10 +486,16 @@
   <!-- ── Sidebar ──────────────────────────────────────────────── -->
    <div id="mySideNav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNavMenu()">&times;</a>
-    <a href="/static/index.html#home" class="active" onclick="setActiveNav(this); closeNavMenu()">Home</a>
-    <!-- <a href="#stats" onclick="setActiveNav(this); closeNavMenu()">Stats</a>
-    <a href="#all-articles" onclick="setActiveNav(this); closeNavMenu()">All Articles</a>
-    <a href="/static/summaries.html" onclick="setActiveNav(this); closeNavMenu()">Summaries</a> -->
+    <!-- Sidebar Home Dropdown-->
+    <button class="sidenav-dropdown">Home
+      <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="sidenav-drop-content">
+      <a href="/static/index.html#stats" onclick="setActiveNav(this); closeNavMenu()">Stats</a>
+      <a href="/static/index.html#all-articles" onclick="setActiveNav(this); closeNavMenu()">All Articles</a>
+    </div>
+    <!--Sidebar Links-->
+    <a href="/static/summaries.html" onclick="setActiveNav(this); closeNavMenu()">Summaries</a>
    </div>
 
   <!-- ── Overlay ──────────────────────────────────────────────── -->
@@ -381,12 +545,14 @@
     let summaries   = [];
 
     const chevronSVG = `<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const loader = document.getElementById('loader');
     const overlay = document.getElementById('myOverlay');
     const sidebar = document.getElementById('mySideNav');
 
     overlay.addEventListener('click', () => {
       closeNavMenu();
     });
+    
 
     // ── Toggle open / closed ───────────────────────────────────
     function toggleCard(card) {
@@ -470,6 +636,39 @@
       document.getElementById("myOverlay").style.display = "none";
     }
 
+    // ── Home Dropdown ──────────────────────────────────────────────────
+    document.querySelectorAll('.nav__links > li').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        const dropdown = item.querySelector('.home-dropdown');
+        if (dropdown) {
+          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+      });
+       item.addEventListener('mouseleave', () => {
+        const dropdown = item.querySelector('.home-dropdown');
+        if (dropdown) {
+          dropdown.style.display = 'none';
+        }
+      });
+    });
+
+    //── Sidebar Dropdown ──────────────────────────────────────────────────
+    document.querySelectorAll('.sidenav-dropdown').forEach(button => {
+      button.addEventListener('click', () => {
+        const content = button.nextElementSibling;
+        if (content) {
+          content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.matches('.sidenav-dropdown')) {
+        document.querySelectorAll('.sidenav-drop-content').forEach(drop => {
+          drop.style.display = 'none';
+        });
+      }
+    });
+
     // ── Build the pagination bar ───────────────────────────────
     function buildPagination() {
       const pg    = document.getElementById('pagination');
@@ -526,6 +725,17 @@
       }
     }
 
+    // ── Fetch trigger ─────────────────────────────────────────
+    async function triggerFetch() {
+      loader.classList.remove('hidden');
+      try {
+        await fetch('/fetch', {method: 'POST'});
+        await loadArticles();
+      } finally {
+        loader.classList.add('hidden');
+      }
+    }
+
     // ── Generate a new summary via Gemini ─────────────────────
     async function generateSummary() {
       const btn     = document.getElementById('gen-btn');
@@ -567,6 +777,7 @@
 
     // ── Init ──────────────────────────────────────────────────
     loadSummaries();
+    window.addEventListener('load', () => loader.classList.add('hidden'));
   </script>
 
 </body>

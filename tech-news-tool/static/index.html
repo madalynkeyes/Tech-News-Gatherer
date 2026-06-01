@@ -119,6 +119,39 @@
     .nav__links a:hover::after, .nav__links a.active::after { width: 100%; }
     .nav__links a.active { color: var(--ink); }
 
+    .home-dropdown{
+      position: absolute;
+      top:100%;
+      left:0;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      list-style: none;
+      padding: 10px;
+      z-index: 1000;
+      display: none;
+    }
+
+    li{
+      position: relative;
+    }
+
+    ul.home-dropdown{
+      position: absolute;
+      top: 100%;
+      left: 0px;
+      background-color: rgb(255, 255, 255);
+      border: 1px solid rgb(204, 204, 204);
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 5px;
+      list-style: none;
+      padding: 10px;
+      margin: 0px;
+      z-index: 1000;
+      min-width: 120px;
+      display: none;
+    }
+
+
     .nav__cta {
       font-size: 0.75rem;
       font-weight: 500;
@@ -149,7 +182,7 @@
       box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
     }
 
-    .sidenav a{
+    .sidenav a, .sidenav-dropdown{
       padding: 8px 8px 8px 32px;
       text-decoration: none;
       font-size: 17px;
@@ -157,9 +190,11 @@
       display: block;
       transition: 0.3s;
       font-family: var(--ff-sans);
+      background-color: var(--accent);
+      border:none;
     }
 
-    .sidenav a:hover{
+    .sidenav a:hover, .sidenav-dropdown:hover{
       color: var(--ink);
     }
 
@@ -169,6 +204,12 @@
       right: 25px;
       font-size: 32px;
       margin-left: 50px;
+    }
+
+    .sidenav-drop-content{
+      display:none;
+      background-color: var(--accent);
+      padding-left:12px;
     }
 
     #myOverlay {
@@ -191,7 +232,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: clamp(60px, 10vw, 120px) var(--gutter) clamp(40px, 6vw, 80px);
+      padding: clamp(60px, 10vw, 120px) var(--gutter) clamp(40px, 6vw, 40px);
       position: relative;
       overflow: hidden;
       /* background: #0d0d0d;      */
@@ -307,6 +348,27 @@
       animation: pulse 2s ease-in-out infinite;
       box-shadow: 0 0 8px rgba(200,75,49,0.8);
     }
+
+    .hero__cta {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border: 1px solid var(--ink);
+      background: transparent;
+      color: var(--ink);
+      border-radius: 2px;
+      transition: all 0.2s;
+      margin-top: 15px;
+    }
+
+    .hero__cta:hover { 
+      background: var(--accent); 
+      color: rgba(250, 250, 248, 0.95);
+      border: 1px solid var(--accent);
+    }
+
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
@@ -825,13 +887,17 @@
   <!-- ── Nav ──────────────────────────────────────────────────── -->
   <nav class="nav">
     <div class="nav__inner">
-      
       <a href="#" class="nav__logo">AI<span>Today</span></a>
       <ul class="nav__links" id="myNavLinks">
-        <li><a href="#home" class="active" onclick="setActiveNav(this)">Home</a></li>
-        <li><a href="#stats" onclick="setActiveNav(this)">Stats</a></li>
-        <li><a href="#all-articles" onclick="setActiveNav(this)">All Articles</a></li>
+        <li>
+          <a href="#home" class="active"onclick="setActiveNav(this)">Home</a>
+          <ul class="home-dropdown" style="display: none;">
+            <li><a href="#stats">Stats</a></li>
+            <li><a href="#all-articles">All Articles</a></li>
+          </ul>
+        </li>
         <li><a href="/static/summaries.html" onclick="setActiveNav(this)">Summaries</a></li>
+        <li><a href="/static/about.html" onclick="setActiveNav(this)">About</a></li>
       </ul>
       <button class="nav__cta" onclick="triggerFetch()">Refresh Feed</button>
       <a href="javascript:void(0);" class="icon" onclick="openNavMenu()">
@@ -843,9 +909,15 @@
   <!-- ── Sidebar ──────────────────────────────────────────────── -->
    <div id="mySideNav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNavMenu()">&times;</a>
-    <a href="#home" class="active" onclick="setActiveNav(this); closeNavMenu()">Home</a>
-    <a href="#stats" onclick="setActiveNav(this); closeNavMenu()">Stats</a>
-    <a href="#all-articles" onclick="setActiveNav(this); closeNavMenu()">All Articles</a>
+    <!-- Sidebar Home Dropdown-->
+    <button class="sidenav-dropdown">Home
+      <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="sidenav-drop-content">
+      <a href="#stats" onclick="setActiveNav(this); closeNavMenu()">Stats</a>
+      <a href="#all-articles" onclick="setActiveNav(this); closeNavMenu()">All Articles</a>
+    </div>
+    <!--Sidebar Links-->
     <a href="/static/summaries.html" onclick="setActiveNav(this); closeNavMenu()">Summaries</a>
    </div>
 
@@ -867,6 +939,8 @@
       </div>
       <span id="hero-separator">·</span>
       <span id="hero-total">— Articles</span>
+    </div>
+    <button class="hero__cta" onclick="setActiveNav()">Learn More</button>
     </div>
   </section>
 
@@ -1180,6 +1254,39 @@
         loader.classList.add('hidden');
       }
     }
+
+    // ── Home Dropdown ──────────────────────────────────────────────────
+    document.querySelectorAll('.nav__links > li').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        const dropdown = item.querySelector('.home-dropdown');
+        if (dropdown) {
+          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+      });
+       item.addEventListener('mouseleave', () => {
+        const dropdown = item.querySelector('.home-dropdown');
+        if (dropdown) {
+          dropdown.style.display = 'none';
+        }
+      });
+    });
+
+    //── Sidebar Dropdown ──────────────────────────────────────────────────
+    document.querySelectorAll('.sidenav-dropdown').forEach(button => {
+      button.addEventListener('click', () => {
+        const content = button.nextElementSibling;
+        if (content) {
+          content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.matches('.sidenav-dropdown')) {
+        document.querySelectorAll('.sidenav-drop-content').forEach(drop => {
+          drop.style.display = 'none';
+        });
+      }
+    });
 
     // ── Init ──────────────────────────────────────────────────
     loadArticles();
